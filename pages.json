@@ -1,0 +1,82 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/home/home",
+			"style": {
+				"navigationBarTitleText": "韩国Yetimall官方商城",
+				"navigationStyle":"custom",
+				"app-plus":{
+					"titleNView":false
+				},
+				"usingComponents":{
+					"van-button": "/wxcomponents/button/index",
+					"van-tab": "/wxcomponents/tab/index",
+					"van-tabs": "/wxcomponents/tabs/index"
+				}
+			}
+		},
+		{
+			"path": "pages/cart/cart",
+			"style": {
+				"navigationBarTitleText": "购物车",
+				"navigationBarTextStyle":"#ffffff"
+			}
+		},
+		{
+			"path": "pages/userCenter/userCenter",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationBarTextStyle":"#ffffff"
+			}
+		},
+		{
+			"path": "pages/home/celebrity",
+			"style": {
+				"navigationBarTitleText": "明星商城",
+				"navigationStyle":"custom",
+				"app-plus":{
+					"titleNView":false
+				}
+			}
+		},
+		{
+			"path": "pages/home/goodsDeatil",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "商品详情",
+				"navigationBarTextStyle":"black"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "Yetimall",
+		"navigationBarBackgroundColor": "#57D0D9",
+		"backgroundColor": "#f3f6f9"
+	},
+	"tabBar": {
+		"color": "#8B8B8B",
+		"selectedColor": "#8B8B8B",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/home/home",
+				"iconPath": "static/images/tabBar/tab-mall.png",
+				"selectedIconPath": "static/images/tabBar/tab-mall-selected.png",
+				"text": "商城"
+			},
+			{
+				"pagePath": "pages/cart/cart",
+				"iconPath": "static/images/tabBar/tab-mall.png",
+				"selectedIconPath": "static/images/tabBar/tab-mall-selected.png",
+				"text": "购物车"
+			},
+			{
+				"pagePath": "pages/userCenter/userCenter",
+				"iconPath": "static/images/tabBar/tab-my.png",
+				"selectedIconPath": "static/images/tabBar/tab-my-selected.png",
+				"text": "我的"
+			}
+		]
+	}
+}
