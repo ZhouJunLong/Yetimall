@@ -104,6 +104,25 @@
 
     </view>
 
+    <view class="detail-bottom">
+      <view class="left-wrap">
+        <view class="customer">
+          <image class="icon"
+                 src="../../static/images/home/customer-icon.png"></image>
+          <text class="text">客服</text>
+        </view>
+        <view class="cart">
+          <image class="icon"
+                 src="../../static/images/home/cart-icon.png"></image>
+          <text class="text">购物车</text>
+        </view>
+      </view>
+      <view class="btn-wrap">
+        <view class="btn cart-btn">加入购物车</view>
+        <view class="btn order-btn">立即购买</view>
+      </view>
+    </view>
+
   </view>
 </template>
 <script>
@@ -365,6 +384,73 @@ export default {
       padding-right: 8rpx;
       display: flex;
       flex-wrap: wrap;
+    }
+  }
+  .detail-bottom {
+    position: fixed;
+    width: 100%;
+    box-sizing: border-box;
+    left: 0;
+    bottom: 0;
+    height: 106rpx;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    padding-left: 47rpx;
+    padding-right: 31rpx;
+    align-items: center;
+    justify-content: space-between;
+    .left-wrap {
+      display: flex;
+      align-items: center;
+      .customer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .cart {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-left: 45rpx;
+      }
+      .icon {
+        width: 34rpx;
+        height: 34rpx;
+      }
+      .text {
+        font-size: 22rpx;
+        font-family: PingFang-SC-Medium, PingFang-SC;
+        font-weight: 500;
+        color: #252525;
+      }
+    }
+
+    .btn-wrap {
+      display: flex;
+      align-items: center;
+    }
+    .btn {
+      width: 238rpx;
+      height: 70rpx;
+      border-radius: 5rpx 5rpx 5rpx 5rpx;
+      line-height: 70rpx;
+      text-align: center;
+      font-size: 26rpx;
+      font-family: PingFang-SC-Bold, PingFang-SC;
+      font-weight: bold;
+    }
+    .cart-btn {
+      // background: #8b8b8b;
+      opacity: 1;
+      border: 1px solid #8b8b8b;
+      color: #252525;
+      margin-right: 14rpx;
+    }
+    .order-btn {
+      background: #63baa6;
+      color: #ffffff;
+      margin-right: 0;
     }
   }
 }

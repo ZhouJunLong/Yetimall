@@ -8,11 +8,11 @@
                  placeholder="请输入搜索内容"
                  placeholder-style="color: #8B8B8B;font-size: 24rpx;" />
         </view>
-        <view class="head-search-all"
+        <!-- <view class="head-search-all"
               @click="jumpCelebrity">
           <view class="all-top">ALL</view>
           <view class="all-bottom">切换</view>
-        </view>
+        </view> -->
       </view>
     </view>
     <view class="container">
@@ -100,25 +100,27 @@ export default {
   margin-bottom: 100rpx;
 }
 .head {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding-top: 64rpx;
+  // position: fixed;
+  // top: 0;
+  // left: 0;
+  // width: 100%;
+  padding-top: 10rpx;
   background-color: #ffffff;
   z-index: 1000;
   padding-left: 28rpx;
   padding-right: 28rpx;
   padding-bottom: 37rpx;
   .head-search {
-    margin-top: 64rpx;
+    // margin-top: 64rpx;
+
     display: flex;
     .head-search-input {
+      width: 100%;
       box-sizing: border-box;
       border-radius: 5rpx 5rpx 5rpx 5rpx;
       background-color: #f5f5f8;
       padding-left: 20rpx;
-      width: 614rpx;
+
       display: flex;
       .iconfont {
         font-size: 30rpx;
@@ -150,8 +152,8 @@ export default {
   }
 }
 .container {
-  position: relative;
-  margin-top: 240rpx;
+  // position: relative;
+  // margin-top: 240rpx;
   width: 100%;
   color: #fff;
   font-size: 30rpx;

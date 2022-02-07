@@ -3,11 +3,9 @@
 		{
 			"path": "pages/home/home",
 			"style": {
-				"navigationBarTitleText": "韩国Yetimall官方商城",
-				"navigationStyle":"custom",
-				"app-plus":{
-					"titleNView":false
-				},
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "商城",
+				"navigationBarTextStyle":"black",
 				"usingComponents":{
 					"van-button": "/wxcomponents/button/index",
 					"van-tab": "/wxcomponents/tab/index",
