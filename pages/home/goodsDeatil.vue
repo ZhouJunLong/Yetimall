@@ -104,7 +104,8 @@
 
     </view>
 
-    <view class="detail-bottom">
+    <view class="detail-bottom"
+          :style="btnBottomStyle">
       <view class="left-wrap">
         <view class="customer">
           <image class="icon"
@@ -119,7 +120,8 @@
       </view>
       <view class="btn-wrap">
         <view class="btn cart-btn">加入购物车</view>
-        <view class="btn order-btn">立即购买</view>
+        <view class="btn order-btn"
+              @click="gotoConfirm">立即购买</view>
       </view>
     </view>
 
@@ -127,10 +129,24 @@
 </template>
 <script>
 import goodCard from '../components/goods-card.vue'
+import tools from '../../common/tools.js'
 
 export default {
   components: {
     'good-card': goodCard,
+  },
+  computed: {
+    btnBottomStyle() {
+      let safeBottom = tools.getSafeAreaBottom()
+      return `padding-bottom:${safeBottom}rpx`
+    },
+  },
+  methods: {
+    gotoConfirm() {
+      uni.navigateTo({
+        url: '/pages/home/confirmOrder',
+      })
+    },
   },
 }
 </script>
@@ -388,16 +404,14 @@ export default {
   }
   .detail-bottom {
     position: fixed;
-    width: 100%;
-    box-sizing: border-box;
+    right: 0;
     left: 0;
     bottom: 0;
     height: 106rpx;
     background-color: #fff;
     display: flex;
     align-items: center;
-    padding-left: 47rpx;
-    padding-right: 31rpx;
+    padding: 19rpx 31rpx 19rpx 47rpx;
     align-items: center;
     justify-content: space-between;
     .left-wrap {

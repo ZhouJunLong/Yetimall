@@ -44,6 +44,14 @@
 				"navigationBarTitleText": "商品详情",
 				"navigationBarTextStyle":"black"
 			}
+		},
+		{
+			"path": "pages/home/confirmOrder",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "确认订单",
+				"navigationBarTextStyle":"black"
+			}
 		}
 	],
 	"globalStyle": {
