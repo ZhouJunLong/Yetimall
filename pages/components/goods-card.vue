@@ -2,20 +2,26 @@
   <view class="goods-item"
         @click="gotoDetail">
     <image class="item-img"
-           src="../../static/temp/shop-good.png"></image>
-    <view class="item-title">YSL圣罗兰 玫瑰金小粉条口红 #214</view>
+           :src="goodItem.imgUrl || '../../static/temp/shop-good.png'"></image>
+    <view class="item-title">{{ goodItem.name || 'YSL圣罗兰 玫瑰金小粉条口红 #214' }}</view>
     <view class="item-bottom">
       <view class="item-bottom-price">
         <text class="price-icon">¥</text>
-        <text class="price-num">218</text>
+        <text class="price-num">{{ goodItem.price || 218}}</text>
       </view>
-      <view class="item-bottom-sale">796人付款</view>
+      <view class="item-bottom-sale">{{ goodItem.saleQuantity || 796 }}人付款</view>
     </view>
   </view>
 </template>
 <script>
 export default {
   name: 'goosCard',
+  props: {
+    goodItem: {
+      type: Object,
+      value: {},
+    },
+  },
   methods: {
     gotoDetail() {
       uni.navigateTo({
@@ -39,7 +45,7 @@ export default {
   .item-title {
     font-size: 24rpx;
     font-family: PingFang-SC-Medium, PingFang-SC;
-    height: 50rpx;
+    min-height: 50rpx;
     padding: 0 16rpx;
   }
   .item-bottom {

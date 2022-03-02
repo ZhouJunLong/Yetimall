@@ -114,12 +114,13 @@
         </view>
         <view class="cart">
           <image class="icon"
-                 src="../../static/images/home/cart-icon.png"></image>
-          <text class="text">购物车</text>
+                 src="../../static/images/home/shoucang-2@2x.png"></image>
+          <text class="text">收藏</text>
         </view>
       </view>
       <view class="btn-wrap">
-        <view class="btn cart-btn">加入购物车</view>
+        <view class="btn cart-btn"
+              @click="addCart">加入购物车</view>
         <view class="btn order-btn"
               @click="gotoConfirm">立即购买</view>
       </view>
@@ -142,6 +143,13 @@ export default {
     },
   },
   methods: {
+    addCart() {
+      uni.showToast({
+        title: '加入购物车成功',
+        icon: 'none',
+        duration: 2000,
+      })
+    },
     gotoConfirm() {
       uni.navigateTo({
         url: '/pages/home/confirmOrder',

@@ -2,12 +2,14 @@
   <view class="container">
     <view class="address">
       <view class="address-null"
-            v-if="!hasAddress">
+            v-if="!hasAddress"
+            @click="selectAddress">
         <view class="title">请填写收货地址</view>
         <image class="arrow"
                src="../../static/images/home/arrow-right.png"></image>
       </view>
       <view class="address-has"
+            @click="selectAddress"
             v-else>
         <view class="address-top">
           <view class="top-btn">默认</view>
@@ -99,7 +101,8 @@
         </view>
         <view class="bottom-left-bottom">优惠：¥15.00</view>
       </view>
-      <view class="btn">提交订单</view>
+      <view class="btn"
+            @click="sumitOrder">提交订单</view>
     </view>
   </view>
 </template>
@@ -115,6 +118,18 @@ export default {
   onLoad() {
     let safeBottom = tools.getSafeAreaBottom() + 20
     this.safeBottom = `padding-bottom:${safeBottom}rpx`
+  },
+  methods: {
+    selectAddress() {
+      uni.navigateTo({
+        url: '/pages/home/addressList',
+      })
+    },
+    sumitOrder() {
+      uni.redirectTo({
+        url: '/pages/home/paySuccess',
+      })
+    },
   },
 }
 </script>

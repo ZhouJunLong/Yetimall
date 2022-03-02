@@ -4,19 +4,19 @@
     <view class="rank-list">
       <view class="rank-item"
             @click="gotoDetail"
-            v-for="(item,index) in 9"
+            v-for="(item,index) in rankList"
             :key="index">
         <view class="rank-item-title">No.{{index+1}}</view>
         <view class="rank-item-other">
           <image class="rank-item-img"
-                 src="../../static/temp/rank-shop.png"></image>
+                 :src="item.imgUrl"></image>
           <view class="rank-item-name">
-            <view>林允儿</view>
-            <view>同款巴宝莉香水</view>
+            <view>{{item.name}}</view>
+            <!-- <view>同款巴宝莉香水</view> -->
           </view>
           <view class="rank-item-bottom">
-            <view class="rank-item-bottom-price">¥1350</view>
-            <view class="rank-item-bottom-sale">本月成交462</view>
+            <view class="rank-item-bottom-price">¥{{ item.price }}</view>
+            <view class="rank-item-bottom-sale">本月成交{{ item.saleQuantity }}</view>
           </view>
         </view>
 
@@ -25,8 +25,21 @@
   </view>
 </template>
 <script>
+/*
+id: 4
+imgUrl: "https://www.yetimall.fun/public/upload/image/store/goods/20220218/c23da5bfdd453f2bf561eac9c1cd4aed.png"
+name: "【NMIXX八站联合】（ms签售版）NMIXX - 1st 单曲专辑 [AD MARE] (Light Ver.)"
+price: 77
+saleQuantity: 54280
+*/
 export default {
   name: 'home-rank',
+  props: {
+    rankList: {
+      type: Array,
+      default: [],
+    },
+  },
   methods: {
     gotoDetail() {
       uni.navigateTo({

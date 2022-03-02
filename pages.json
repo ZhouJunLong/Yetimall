@@ -3,6 +3,7 @@
 		{
 			"path": "pages/home/home",
 			"style": {
+				"enablePullDownRefresh": true,
 				"navigationBarBackgroundColor": "#ffffff",
 				"navigationBarTitleText": "商城",
 				"navigationBarTextStyle":"black",
@@ -17,14 +18,18 @@
 			"path": "pages/cart/cart",
 			"style": {
 				"navigationBarTitleText": "购物车",
-				"navigationBarTextStyle":"#ffffff"
+				"navigationBarTextStyle":"black",
+				"navigationBarBackgroundColor": "#ffffff"
 			}
 		},
 		{
 			"path": "pages/userCenter/userCenter",
 			"style": {
-				"navigationBarTitleText": "我的",
-				"navigationBarTextStyle":"#ffffff"
+				"navigationStyle":"custom",
+				"backgroundColor": "#ffffff",
+				"app-plus":{
+					"titleNView":false
+				}
 			}
 		},
 		{
@@ -50,6 +55,86 @@
 			"style": {
 				"navigationBarBackgroundColor": "#ffffff",
 				"navigationBarTitleText": "确认订单",
+				"navigationBarTextStyle":"black"
+			}
+		},
+		{
+			"path": "pages/home/addNewAddress",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "添加新地址",
+				"navigationBarTextStyle":"black",
+				"usingComponents":{
+					"van-switch": "/wxcomponents/switch/index"
+				}
+			}
+		},
+		{
+			"path": "pages/home/addressList",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "地址管理",
+				"navigationBarTextStyle":"black",
+				"backgroundColor": "#ffffff"
+			}
+		},
+		{
+			"path": "pages/home/paySuccess",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "支付结果",
+				"navigationBarTextStyle":"black"
+			}
+		},
+		{
+			"path": "pages/home/orderDetail",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "订单详情",
+				"navigationBarTextStyle":"black"
+			}
+		},
+		{
+			"path": "pages/userCenter/orderList",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "我的订单",
+				"navigationBarTextStyle":"black",
+				"usingComponents":{
+					"van-tab": "/wxcomponents/tab/index",
+					"van-tabs": "/wxcomponents/tabs/index"
+				}
+			}
+		},
+		{
+			"path": "pages/userCenter/collect",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "我的收藏",
+				"navigationBarTextStyle":"black"
+			}
+		},
+		{
+			"path": "pages/userCenter/deliveryLine",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "物流",
+				"navigationBarTextStyle":"black"
+			}
+		},
+		{
+			"path": "pages/userCenter/bindMobile",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "绑定手机号",
+				"navigationBarTextStyle":"black"
+			}
+		},
+		{
+			"path": "pages/userCenter/phoneCode",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "",
 				"navigationBarTextStyle":"black"
 			}
 		}
