@@ -87,8 +87,8 @@ export default {
     }
     .header-icon {
       position: absolute;
-      background: #63baa6;
-      border: 2rpx solid #63baa6;
+      background: #0183fc;
+      border: 2rpx solid #0183fc;
       width: 64rpx;
       height: 64rpx;
       opacity: 0.54;
@@ -162,9 +162,9 @@ export default {
         .header-right {
           width: 126rpx;
           height: 52rpx;
-          //   background: #63baa6;
+          //   background: #0183FC;
           border-radius: 5rpx 5rpx 5rpx 5rpx;
-          border: 1px solid #63baa6;
+          border: 1px solid #0183fc;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -176,7 +176,7 @@ export default {
             font-size: 24rpx;
             font-family: PingFang-SC-Medium, PingFang-SC;
             font-weight: 500;
-            color: #63baa6;
+            color: #0183fc;
           }
         }
       }

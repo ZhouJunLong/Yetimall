@@ -4,8 +4,8 @@
     <view class="detail_header">
       <view class="detail_header_top">
         <view class=header_left>
-          <view class="header_left_title header_title">{{ orderStateObj.stateTitle }}</view>
-          <view class="header_left_des header_des">{{ orderStateObj.stateDes }}</view>
+          <view class="header_left_title header_title">{{ orderDetail.orderStateText }}</view>
+          <view class="header_left_des header_des">{{ orderDetail.orderStateTextB }}</view>
         </view>
       </view>
       <!-- 快递信息 -->
@@ -31,9 +31,9 @@
                  src="../../static/images/home/location.png"></image>
           <text class="address_name">收货人：{{ addressInfo.name }}</text>
         </view>
-        <view class="address_mobile">{{ addressInfo.send_phone }}</view>
+        <view class="address_mobile">{{ addressInfo.phone }}</view>
       </view>
-      <view class="detail_address_des">{{ addressInfo.address }}</view>
+      <view class="detail_address_des">{{ addressInfo.addressDetail }}</view>
     </view>
     <view class="detail_goods">
       <view class="goods_top">
@@ -48,11 +48,14 @@
               @click="gotoGoodDetail"
               :data-gid="item.gid">
           <image class="good_item_pic"
-                 :src="base_url+item.thumb"></image>
+                 :src="item.imgUrl"></image>
           <view class="good_item_right">
-            <view class="good_item_title">{{ item.goods_name }}</view>
+            <view class="good_item_title">{{ item.name }}</view>
             <view class="good_item_des">
-              <view class="good_item_des_spec">{{ item.property && item.property[0].value || '默认' }}</view>
+              <view class="good_item_des_spec">
+                <text v-for="(item,index) in item.propertyList"
+                      :key="index">{{ item.name }} {{ item.value }}</text>
+              </view>
               <view class="good_item_num">数量：x{{ item.count }}</view>
             </view>
             <view class="good_item_price">
@@ -66,11 +69,11 @@
     <view class="detail_fee">
       <view class="detail_fee_item">
         <view class="detail_fee_item_title">运费</view>
-        <view class="detail_fee_item_num">¥{{feeDetail.delivery_fee}}</view>
+        <view class="detail_fee_item_num">¥{{feeDetail.deliveryFee}}</view>
       </view>
       <view class="detail_fee_item">
         <view class="detail_fee_item_title">合计支付</view>
-        <view class="detail_fee_item_num">¥{{ feeDetail.total_price }}</view>
+        <view class="detail_fee_item_num">¥{{ feeDetail.orderPricePay }}</view>
       </view>
     </view>
     <view class="detail_info">
@@ -79,9 +82,9 @@
         <view class="info_item">
           <view class="info_item_title">订单编号：</view>
           <view class="info_item_right">
-            <view class="info_item_right_text">{{ infoDetail.order_num }}</view>
+            <view class="info_item_right_text">{{ infoDetail.orderNum }}</view>
             <view class="copy_btn"
-                  @click="copy(infoDetail.order_num)">复制</view>
+                  @click="copy(infoDetail.orderNum)">复制</view>
           </view>
         </view>
         <view class="info_item">
@@ -91,13 +94,13 @@
           </view>
         </view>
         <view class="info_item"
-              v-if="infoDetail.delivery_num">
+              v-if="infoDetail.deliveryNum">
           <view class="info_item_title">快递单号：</view>
           <view class="info_item_right"
-                v-if="infoDetail.delivery_num">
-            <view class="info_item_right_text">{{ infoDetail.delivery_num }}</view>
+                v-if="infoDetail.deliveryNum">
+            <view class="info_item_right_text">{{ infoDetail.deliveryNum }}</view>
             <view class="copy_btn"
-                  @click="copy(infoDetail.delivery_num)">复制</view>
+                  @click="copy(infoDetail.deliveryNum)">复制</view>
           </view>
         </view>
         <view class="info_item"
@@ -128,6 +131,8 @@
       <view class="cancel_pri detail_btn"
             v-if="orderStateObj.showPayBtn"
             @click="payOrder">立即付款</view>
+      <view class="cancel_pri detail_btn"
+            @click="payOrder">立即付款</view>
       <!-- <view class="cancel_pri detail_btn" v-if="orderStateObj.showComment" @click="addComment">评价</view> -->
     </view>
   </view>
@@ -135,6 +140,7 @@
 <script>
 import tools from '../../common/tools.js'
 import CONFIG from '../../common/config.js'
+import { mapState, mapActions, mapMutations } from 'vuex'
 let base_url = CONFIG.BASE_URL
 const stateConfig = CONFIG.stateConfig
 let is_click = true
@@ -148,14 +154,14 @@ export default {
     }
   },
   onLoad(options) {
-    this.oid = options.oid || '3374'
+    this.oid = options.oid
     this.getOrderDetail()
   },
   computed: {
     orderState() {
       if (!this.orderDetail) return false
-      const { state } = this.orderDetail
-      return state
+      const { orderState } = this.orderDetail
+      return orderState
     },
     orderStateObj() {
       if (!this.orderDetail) return {}
@@ -167,52 +173,70 @@ export default {
     },
     addressInfo() {
       if (!this.orderDetail) return {}
-      const { name, address, send_phone } = this.orderDetail
+      const { name, addressDetail, phone } = this.orderDetail
       return {
         name,
-        address,
-        send_phone: tools.formatPhone(send_phone),
+        addressDetail,
+        phone: tools.formatPhone(phone),
       }
     },
     goodsList() {
       if (!this.orderDetail) return []
-      return this.orderDetail.goods_list || []
+      this.orderDetail.orderGoodsList &&
+        this.orderDetail.orderGoodsList.forEach((item) => {
+          item.property && (item.propertyList = JSON.parse(item.property))
+        })
+      console.log(
+        '--- this.orderDetail.orderGoodsList--',
+        this.orderDetail.orderGoodsList
+      )
+      return this.orderDetail.orderGoodsList || []
     },
     feeDetail() {
       if (!this.orderDetail) return {}
-      const { total_price, delivery_fee } = this.orderDetail
+      const { orderPricePay, deliveryFee } = this.orderDetail
       return {
-        total_price: total_price || 0,
-        delivery_fee: delivery_fee || 0,
+        orderPricePay: orderPricePay || 0,
+        deliveryFee: deliveryFee || 0,
       }
     },
     infoDetail() {
       if (!this.orderDetail) return {}
-      const { order_num, delivery_num, add_time, pay_method } = this.orderDetail
+      const { orderNum, deliveryNum, add_time, payType } = this.orderDetail
       return {
-        order_num,
+        orderNum,
         add_time,
-        pay_method: pay_method == 1 ? '微信支付' : '',
-        delivery_num,
+        payType:
+          payType == 3 ? '余额支付' : payType === 2 ? '支付宝支付' : '微信支付',
+        deliveryNum,
       }
     },
+    // 备注
     remark_text() {
       if (!this.orderDetail) return ''
-      const { remarks_user } = this.orderDetail
-      return remarks_user || ''
+      const { remarksUser } = this.orderDetail
+      return remarksUser || ''
     },
+    // 发货时间
     delivery_time() {
       if (!this.orderDetail) return ''
-      const { delivery_time } = this.orderDetail
-      return delivery_time || ''
+      const { deliveryTime } = this.orderDetail
+      return deliveryTime || ''
     },
+    // 快递信息
     trajectory() {
-      if (!this.orderDetail || !this.orderDetail.trajectory) return false
-      const { trajectory } = this.orderDetail
-      return trajectory
+      if (
+        !this.orderDetail ||
+        !this.orderDetail.deliveryList ||
+        this.orderDetail.deliveryList.length <= 0
+      )
+        return false
+      const { deliveryList } = this.orderDetail
+      return deliveryList[0]
     },
   },
   methods: {
+    ...mapActions(['getOrderInfo']),
     gotoDelivery() {
       uni.navigateTo({
         url: '/pages/userCenter/deliveryLine?oid=' + this.oid,
@@ -220,239 +244,14 @@ export default {
     },
     //获取订单详情
     // https://www.yetimall.fun/public/home/WxStore/getOrderInfo?oid=2898
-    getOrderDetail() {
-      tools.httpClient(
-        'home/WxStore/getOrderInfo',
-        { oid: this.oid },
-        (error, result) => {
-          if (result.errorCode === 0) {
-            let res = result.data
-            this.orderDetail = res
-            this.showDetail = true
-          } else {
-            uni.showToast({
-              title: result.errorInfo || '请求失败,请稍后再试',
-              icon: 'none',
-              duration: 3000,
-            })
-            this.showDetail = false
-          }
-        }
-      )
-    },
-    //订单商品详情
-    gotoGoodDetail(e) {
-      const gid = e.currentTarget.dataset.gid
-      if (gid) {
-        uni.navigateTo({
-          url: '/pages/store/goodsDetail/goodsDetail?gid=' + gid,
-        })
+    async getOrderDetail() {
+      let res = await this.getOrderInfo(this.oid)
+      if (res) {
+        this.orderDetail = res
+        this.showDetail = true
       }
     },
-    //申请退款
-    refundOrder() {
-      var data = {
-        oid: this.oid,
-        state: 6,
-      }
-      //提示
-      uni.showModal({
-        title: '提示',
-        content: '确定申请退款吗？',
-        showCancel: true,
-        confirmColor: '#3056d1',
-        success: function (res) {
-          if (res.confirm) {
-            //退款操作
-            uni.showLoading({
-              title: '加载中',
-            })
-            if (is_click) {
-              is_click = false
-              tools.httpClient(
-                'home/WxStore/setOrderState',
-                data,
-                function (err, res) {
-                  uni.hideLoading()
-                  is_click = true
-                  if (res.errorCode == 0) {
-                    uni.navigateBack({
-                      delta: 1,
-                    })
-                    // uni.reLaunch({
-                    //     url:'/pages/userCenter/orderList/orderList'
-                    // })
-                  } else {
-                    uni.showToast({
-                      title: '操作失败',
-                      icon: 'none',
-                      duration: 2000,
-                    })
-                  }
-                }
-              )
-            }
-          }
-        },
-      })
-    },
-    addComment() {
-      const oid = this.oid
-      if (oid) {
-        uni.navigateTo({
-          url: '/pages/userCenter/addComment/addComment?oid=' + oid,
-        })
-      }
-    },
-    payOrder: function () {
-      if (!this.oid) return
-      uni.showLoading({
-        title: '加载中',
-      })
-      uni.request({
-        url: base_url + '../extend/pay/request/WxAppPay.php',
-        data: { oid: this.oid },
-        header: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        method: 'GET',
-        success: function (res) {
-          uni.hideLoading() //隐藏提示层
-          if (res.data.rescode == '0000') {
-            var resmsg = JSON.parse(res.data.resmsg)
-            uni.requestPayment({
-              timeStamp: resmsg.timeStamp,
-              nonceStr: resmsg.nonceStr,
-              package: resmsg.package,
-              signType: resmsg.signType,
-              paySign: resmsg.paySign,
-              success: function (res) {
-                console.log(res)
-                uni.showToast({
-                  title: '支付成功',
-                  icon: 'success',
-                  success: function () {
-                    setTimeout(function () {
-                      uni.navigateBack({
-                        delta: 1,
-                      })
-                      // uni.reLaunch({
-                      //     url:'/pages/userCenter/orderList/orderList?state=1'
-                      // })
-                    }, 1000)
-                  },
-                })
-              },
-            })
-          } else if (res.data.errorCode == 1) {
-            uni.showToast({
-              title: res.data.errorInfo || '跳转支付失败，请尝试重新支付!',
-              icon: 'none',
-              duration: 3000,
-            })
-            return false
-          } else {
-            uni.showToast({
-              title: '跳转支付失败，请尝试重新支付!',
-              icon: 'none',
-              duration: 3000,
-            })
-            return false
-          }
-        },
-      })
-    },
-    //删除订单
-    deleteOrder() {
-      if (!this.oid) return
-      var data = {
-        oid: this.oid,
-      }
-      //提示
-      uni.showModal({
-        title: '提示',
-        content: '确定删除该订单吗？',
-        showCancel: true,
-        confirmColor: '#3056d1',
-        success: function (res) {
-          if (res.confirm) {
-            //删除操作
-            uni.showLoading({
-              title: '加载中',
-            })
-            tools.httpClient(
-              'home/WxStore/deleteOrder',
-              data,
-              function (err, res) {
-                uni.hideLoading()
-                if (res.errorCode == 0) {
-                  uni.navigateBack({
-                    delta: 1,
-                  })
-                  //    uni.reLaunch({
-                  //         url:'/pages/userCenter/orderList/orderList'
-                  //     })
-                } else {
-                  uni.showToast({
-                    title: '操作失败',
-                    icon: 'none',
-                    duration: 2000,
-                  })
-                }
-              }
-            )
-          }
-        },
-      })
-    },
-    //取消订单
-    cancelOrder: function (index) {
-      if (!this.oid) return
-      var data = {
-        oid: this.oid,
-        state: 4,
-      }
-      //提示
-      uni.showModal({
-        title: '提示',
-        content: '确定取消订单吗？',
-        showCancel: true,
-        confirmColor: '#3056d1',
-        success: function (res) {
-          if (res.confirm) {
-            //取消操作
-            uni.showLoading({
-              title: '加载中',
-            })
-            if (is_click) {
-              is_click = false
-              tools.httpClient(
-                'home/WxStore/setOrderState',
-                data,
-                function (err, res) {
-                  uni.hideLoading()
-                  is_click = true
-                  if (res.errorCode == 0) {
-                    uni.navigateBack({
-                      delta: 1,
-                    })
-                    // uni.reLaunch({
-                    //     url:'/pages/userCenter/orderList/orderList'
-                    // })
-                  } else {
-                    uni.showToast({
-                      title: '操作失败',
-                      icon: 'none',
-                      duration: 2000,
-                    })
-                  }
-                }
-              )
-            }
-          }
-        },
-      })
-    },
+
     copy(data) {
       tools.copy(data)
     },
@@ -725,7 +524,7 @@ page {
       border: 1px solid #8b8b8b;
     }
     .cancel_pri {
-      background: #63baa6;
+      background: #0183fc;
       color: #ffffff;
     }
     .detail_btn {

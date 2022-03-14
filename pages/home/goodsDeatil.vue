@@ -3,7 +3,7 @@
     <view class="header">
       <view class="header-banner">
         <image class="banner-img"
-               src="../../static/temp/good-detail-pic.png"></image>
+               :src="goodDetail.imgUrl"></image>
       </view>
     </view>
     <view class="detail">
@@ -11,18 +11,19 @@
         <view class="info-top">
           <view class="info-top-left">
             <view class="price-icon">¥</view>
-            <view class="price-num">149</view>
+            <view class="price-num">{{ goodDetail.price }}</view>
           </view>
-          <view class="info-top-right">已售6.2万件</view>
+          <view class="info-top-right">已售{{goodDetail.saleQuantity}}件</view>
         </view>
         <view class="info-center">
-          【新年礼物】LANCOME/兰蔻菁纯柔雾哑光唇膏粉金8 88 兰蔻口红274 #可加购定制刻字##周冬雨/金晨/周 也##送女
+          {{goodDetail.name}}
         </view>
-        <view class="info-bottom">
-          截止日期倒计时 27天23:15:45
+        <view class="info-bottom"
+              v-if="goodDetail.endBuyTime">
+          截止日期倒计时 {{goodDetail.endBuyTime}}
         </view>
       </view>
-      <view class="celebrity-info">
+      <!-- <view class="celebrity-info">
         <view class="celebrity-left">
           <image class="celebrity-left-icon"
                  src="../../static/temp/shop-celebrity-icon.png"></image>
@@ -35,7 +36,7 @@
         </view>
         <image class="celebrity-right"
                src=""></image>
-      </view>
+      </view> -->
       <view class="recommend-info">
         <view class="recommend-top">
           <view class="title">明星推荐</view>
@@ -59,37 +60,14 @@
           </view>
         </view>
       </view>
-      <view class="parameter-info">
-        <view class="parameter-top">
-          <view class="title">产品参数</view>
+      <view class="parameter-info"
+            v-if="goodDetail.descParameter">
+        <view v-html="desnodes">
         </view>
-        <view class="parameter-list">
-          <view class="parameter-item">
-            <view class="item-left">品牌</view>
-            <view class="item-right">LANCOME/兰蔻</view>
-          </view>
-          <view class="parameter-item">
-            <view class="item-left">主货号</view>
-            <view class="item-right">兰蔻菁纯柔雾哑光唇膏</view>
-          </view>
-          <view class="parameter-item">
-            <view class="item-left">发售价格</view>
-            <view class="item-right">¥399(仅供参考）</view>
-          </view>
-        </view>
-
       </view>
     </view>
-    <view class="detail-img">
-      <image class="pic"
-             mode='widthFix'
-             src='../../static/temp/goods-detail-img1.png'></image>
-      <image class="pic"
-             mode='widthFix'
-             src='../../static/temp/goods-detail-img2.png'></image>
-      <image class="pic"
-             mode='widthFix'
-             src='../../static/temp/goods-detail-img3.png'></image>
+    <view class="detail-img"
+          v-html="goodDetail.descDetail">
     </view>
     <view class="recommend-goods">
       <view class="title-wrap">
@@ -125,24 +103,71 @@
               @click="gotoConfirm">立即购买</view>
       </view>
     </view>
-
+    <uni-popup v-if="showSpec"
+               ref="popup"
+               type="bottom">
+      <spec :goodsId='goodsId'
+            :isStandard='isStandard'
+            @close="closeHandle"
+            @gotoBuy="gotoBuyHandle"></spec>
+    </uni-popup>
   </view>
 </template>
 <script>
 import goodCard from '../components/goods-card.vue'
+import spec from '../components/spec.vue'
+
 import tools from '../../common/tools.js'
+import { mapState, mapActions } from 'vuex'
 
 export default {
+  data() {
+    return {
+      goodsId: 0,
+      isStandard: 0,
+      goodDetail: null,
+      showSpec: false,
+    }
+  },
   components: {
     'good-card': goodCard,
+    spec,
   },
   computed: {
     btnBottomStyle() {
       let safeBottom = tools.getSafeAreaBottom()
       return `padding-bottom:${safeBottom}rpx`
     },
+    desnodes() {
+      if (this.goodDetail && this.goodDetail.descParameter) {
+        let nodes = this.goodDetail.descParameter.replace(
+          /\<img/gi,
+          '<img style="max-width:100%;height:auto" '
+        )
+        return nodes
+      }
+      return ''
+    },
+  },
+  async onLoad(query) {
+    this.goodsId = query.id || 0
+    let res = await this.getGoodsDetail(this.goodsId)
+    this.goodDetail = res
+    this.isStandard = this.goodDetail.isStandard
   },
   methods: {
+    ...mapActions(['getGoodsDetail', 'getGoodsInventory']),
+    async gotoBuyHandle(params) {
+      this.closeHandle()
+      if (!params) return
+      let res = await this.getGoodsInventory(params)
+      if (res) {
+        uni.setStorageSync('orderConfirmInfo', params)
+        uni.navigateTo({
+          url: '/pages/home/confirmOrder',
+        })
+      }
+    },
     addCart() {
       uni.showToast({
         title: '加入购物车成功',
@@ -151,9 +176,29 @@ export default {
       })
     },
     gotoConfirm() {
-      uni.navigateTo({
-        url: '/pages/home/confirmOrder',
+      this.showSpec = !!this.isStandard
+      this.$nextTick(() => {
+        this.isStandard && this.$refs.popup.open('bottom')
       })
+
+      if (!this.isStandard) {
+        let params = {
+          orderGoodsList: [
+            {
+              count: 1,
+              id: this.goodDetail.id,
+            },
+          ],
+          additionalOrderGoodsList: [],
+        }
+        this.gotoBuyHandle(params)
+      }
+      // uni.navigateTo({
+      //   url: '/pages/home/confirmOrder',
+      // })
+    },
+    closeHandle() {
+      this.showSpec = false
     },
   },
 }
@@ -185,7 +230,7 @@ export default {
     z-index: 2;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    // align-items: center;
     // width: 716rpx;
     // margin-left: 17rpx;
     // margin-right: 17rpx;
@@ -340,35 +385,47 @@ export default {
     }
   }
   .parameter-info {
-    padding: 29rpx 19rpx 41rpx 19rpx;
+    // padding: 29rpx 19rpx 41rpx 19rpx;
     background-color: #fff;
-    margin-top: 12rpx;
-    .parameter-top {
-      .title {
-        font-size: 28rpx;
-        font-family: PingFang-SC-Bold, PingFang-SC;
-        font-weight: bold;
-        color: #1d1d1d;
-      }
+    img {
+      width: 710rpx;
     }
-    .parameter-list {
-      margin-top: 22rpx;
-      .parameter-item {
-        font-size: 22rpx;
-        font-family: PingFang-SC-Medium, PingFang-SC;
-        color: #252525;
-        display: flex;
-        .item-left {
-          width: 175rpx;
-          height: 68rpx;
-          padding-left: 38rpx;
-        }
-        .item-right {
-          height: 68rpx;
-          padding-left: 38rpx;
-        }
-      }
-    }
+    // display: flex;
+    // justify-content: center;
+    // .img {
+    //   width: 100%;
+    // }
+    // margin-top: 12rpx;
+    // img {
+    //   width: 100%;
+    //   height: 100%;
+    // }
+    // .parameter-top {
+    //   .title {
+    //     font-size: 28rpx;
+    //     font-family: PingFang-SC-Bold, PingFang-SC;
+    //     font-weight: bold;
+    //     color: #1d1d1d;
+    //   }
+    // }
+    // .parameter-list {
+    //   margin-top: 22rpx;
+    //   .parameter-item {
+    //     font-size: 22rpx;
+    //     font-family: PingFang-SC-Medium, PingFang-SC;
+    //     color: #252525;
+    //     display: flex;
+    //     .item-left {
+    //       width: 175rpx;
+    //       height: 68rpx;
+    //       padding-left: 38rpx;
+    //     }
+    //     .item-right {
+    //       height: 68rpx;
+    //       padding-left: 38rpx;
+    //     }
+    //   }
+    // }
   }
   .detail-img {
     width: 100%;
@@ -470,7 +527,7 @@ export default {
       margin-right: 14rpx;
     }
     .order-btn {
-      background: #63baa6;
+      background: #0183fc;
       color: #ffffff;
       margin-right: 0;
     }

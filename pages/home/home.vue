@@ -12,7 +12,7 @@
     </view>
     <view class="container">
       <view class="container-top">
-        <van-tabs color='#63BAA6'
+        <van-tabs color='#0183FC'
                   :active="active"
                   line-width='38rpx'
                   @change="onChange"

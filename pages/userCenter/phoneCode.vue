@@ -1,89 +1,107 @@
 <template>
   <view class="code-container">
     <view class="header">
-      <view class="title">输入验证码</view>
-      <view class="des">验证码通过短信发送至 +86 15639722647</view>
+      <view class="title">{{ titleText }}</view>
+      <view class="des">{{ desText }}</view>
     </view>
-    <view class="code-wrap">
-      <view class="code-list"
-            @click="handleFocus">
-        <view class="code-item"
-              :class="(code.length === index || code.length === 4 && index === 3) && focus ? 'input-active': ''"
-              v-for="(item,index) in 4"
-              :key="index">
-          {{code[index] || ''}}
+    <view class="before-code"
+          v-if="beforeCode">
+      <view class="mobile">
+        <view class="mobile-input">
+          <view class="text">+86</view>
+          <input class="input"
+                 :disabled='type===2'
+                 v-model="inputPhone"
+                 type="text"
+                 maxlength="11"
+                 placeholder="请输入手机号码">
         </view>
+        <image class="mobile-input-img"
+               src='../../static/images/user/yeye-input.png'></image>
+
       </view>
-      <input class="input"
-             :value="code"
-             maxlength="4"
-             type="number"
-             :focus="focus"
-             @input="handleInput"
-             @blur="handleBlur">
-    </view>
-    <view class="re-code">
-      <view v-if="!canRecode">
-        <text class="text-de">重新获取验证码</text>
-        <text class="text-btn">{{ timer }}s</text>
-      </view>
-      <view v-else>
-        <text class="text-btn">获取验证码</text>
+      <view class="btn-wrap"
+            @click="getSendCode">
+        <text class="btn-text">获取验证码</text>
       </view>
     </view>
+    <phone-code :show='!beforeCode'
+                @complete='completeHandle'></phone-code>
   </view>
 </template>
 <script>
+import { mapState, mapActions, mapMutations } from 'vuex'
+import phoneCode from '@components/user/phone-code'
+
 export default {
+  components: {
+    'phone-code': phoneCode,
+  },
   data() {
     return {
-      focus: false,
       code: '',
-      canRecode: true,
-      timer: 60,
-      timerId: null,
+      type: 1, //1登录 2旧手机号 3新手机号
+      beforeCode: false, //是否是获取验证码之前的状态
+      currentPhone: '', //当前获取验证码的手机号
+      inputPhone: '',
     }
   },
-  computed: {},
-  onLoad() {
-    this.canRecode = false
-    this.delayTime()
+  computed: {
+    ...mapState(['sendCodeInfo']),
+    titleText() {
+      if (this.type === 1) {
+        return '输入验证码'
+      }
+      if (this.type === 2 && this.beforeCode) {
+        return '验证旧手机号'
+      }
+      if (this.type === 3 && this.beforeCode) {
+        return '验证新手机号'
+      }
+      return '输入验证码'
+    },
+    desText() {
+      if (this.type === 1) {
+        return '验证码通过短信发送至 +86 15639722647'
+      }
+      if (this.type === 2 && this.beforeCode) {
+        return '为保证你的账号安全，需先验证你的身份'
+      }
+      if (this.type === 3 && this.beforeCode) {
+        return `您目前的手机号是+86 ${this.currentPhone}，您想要更改为？`
+      }
+      return `验证码通过短信发送至 +86 ${this.currentPhone}`
+    },
   },
-  onUnload() {
-    this.clearTime()
+  onLoad(query) {
+    this.type = +query.type || 1
+    if (this.type === 2) {
+      const tokenInfo = uni.getStorageSync('tokenInfo')
+      this.currentPhone = tokenInfo.telephone
+      this.inputPhone = tokenInfo.telephone
+      this.beforeCode = true
+    }
   },
   methods: {
-    clearTime() {
-      if (!this.timer) return
-      clearInterval(this.timerId)
-      this.timerId = null
+    ...mapActions(['login']),
+    getSendCode() {
+      // 发送验证码
+      this.beforeCode = false
     },
-    delayTime() {
-      this.timerId = setInterval(() => {
-        this.timer = this.timer - 1
-        if (this.timer <= 0) {
-          this.timer = 60
-          this.canRecode = true
+    async completeHandle(code) {
+      if (this.type === 1) {
+        let res = await this.login(code)
+        if (res) {
+          uni.navigateBack({ delta: 1 })
         }
-      }, 1000)
-    },
-    complete() {
-      uni.navigateBack({ delta: 1 })
-    },
-    clear() {
-      this.code = ''
-    },
-    handleFocus() {
-      this.focus = true
-    },
-    handleInput(e) {
-      this.code = e.detail.value
-      if (this.code.length >= 4) {
-        this.complete()
+      } else if (this.type === 2) {
+        this.type = 3
+        this.beforeCode = true
+        this.currentPhone = this.inputPhone
+        this.inputPhone = ''
+      } else {
+        uni.navigateBack({ delta: 1 })
       }
-    },
-    handleBlur() {
-      this.focus = false
     },
   },
 }
@@ -154,6 +172,66 @@ page {
     }
   }
 }
+.before-code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .mobile {
+    margin-top: 58rpx;
+    width: 516rpx;
+    height: 83rpx;
+    position: relative;
+    .mobile-input-img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 516rpx;
+      height: 83rpx;
+      z-index: 1;
+    }
+    .mobile-input {
+      display: flex;
+      z-index: 2;
+      align-items: center;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      .text {
+        width: 120rpx;
+        height: 71rpx;
+        font-size: 32rpx;
+        font-family: PingFang SC;
+        font-weight: 500;
+        color: #4860ef;
+        text-align: center;
+        line-height: 71rpx;
+      }
+      .input {
+        height: 71rpx;
+      }
+    }
+  }
+
+  .btn-wrap {
+    margin-top: 29rpx;
+    width: 516rpx;
+    height: 83rpx;
+    background-color: #0183fc;
+    border-radius: 42rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .btn-text {
+      font-size: 28rpx;
+      font-family: PingFang SC;
+      font-weight: 500;
+      color: #ffffff;
+    }
+  }
+}
+
 .input-active {
   border: 1px solid orange;
 }

@@ -117,7 +117,7 @@ export default {
       .call-btn {
         width: 135rpx;
         height: 49rpx;
-        background: #63baa6;
+        background: #0183fc;
         border-radius: 5rpx;
         font-size: 24rpx;
         font-family: PingFang SC;
@@ -179,7 +179,7 @@ export default {
           }
           .line-line-active {
             height: 173rpx;
-            border: 1px dashed #63baa6;
+            border: 1px dashed #0183fc;
           }
         }
         .item-info {
@@ -198,7 +198,7 @@ export default {
         }
       }
       .actvie {
-        color: #63baa6;
+        color: #0183fc;
       }
     }
   }

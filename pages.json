@@ -137,6 +137,14 @@
 				"navigationBarTitleText": "",
 				"navigationBarTextStyle":"black"
 			}
+		},
+		{
+			"path": "pages/userCenter/accountManage",
+			"style": {
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "账号管理",
+				"navigationBarTextStyle":"black"
+			}
 		}
 	],
 	"globalStyle": {

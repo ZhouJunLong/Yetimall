@@ -25,7 +25,7 @@ export default {
   methods: {
     gotoDetail() {
       uni.navigateTo({
-        url: '/pages/home/goodsDeatil',
+        url: '/pages/home/goodsDeatil?id=' + this.goodItem.id,
       })
     },
   },

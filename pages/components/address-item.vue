@@ -1,39 +1,88 @@
 <template>
-  <view>
+  <view v-if="itemData">
     <view class="address-item">
       <view class="item-top">
-        <view class="top-left">
-          <view class="item-icon">鹿</view>
+        <view class="top-left"
+              @click="selecAddressItem">
+          <view class="item-icon">{{ itemData.name[0] }}</view>
           <view class="item-info">
             <view class="info-top">
-              <view class="item-name">鹿聪明</view>
-              <view class="item-phone">156****2647</view>
+              <view class="item-name">{{ itemData.name }}</view>
+              <view class="item-phone">{{ itemData.phone }}</view>
             </view>
             <view class="info-bottom">
-              <view class="info-bottom-def">默认</view>
-              <view class="info-bottom-address">河南省郑州市管城回族区金成国贸大厦</view>
+              <view class="info-bottom-def"
+                    v-if="itemData.isDefault">默认</view>
+              <view class="info-bottom-address">{{ itemData.address + ' ' +itemData.addressDetail }}</view>
             </view>
           </view>
         </view>
         <view class="top-right">
           <view class="line"></view>
-          <image class="edit"></image>
+          <image class="edit"
+                 @click="editAddress()"
+                 src='../../static/images/home/edit-icon.png'></image>
         </view>
       </view>
       <view class="item-bottom">
         <view class="item-bottom-left">
-          <image class="select selected"></image>
+          <!-- <image class="select selected"></image> -->
+          <image class="select"
+                 @click="setDefaultAddress"
+                 :src="itemData.isDefault ? '../../static/images/home/selected-icon.png' : '../../static/images/home/no-selected-icon.png'"></image>
           <view class="text">默认地址</view>
         </view>
-        <view class="item-bottom-right">删除</view>
+        <view class="item-bottom-right"
+              @click="deleteAddress">删除</view>
       </view>
     </view>
   </view>
 </template>
 <script>
+import { mapState, mapActions, mapMutations } from 'vuex'
+
 export default {
-  name: 'goosCard',
-  methods: {},
+  name: 'addressItem',
+  props: {
+    itemData: {
+      type: Object,
+      value: null,
+    },
+  },
+  computed: {},
+  methods: {
+    ...mapActions(['addressList', 'addressDelete', 'setAddressDefault']),
+    ...mapMutations(['setStateByKey']),
+    editAddress() {
+      uni.navigateTo({
+        url: '/pages/home/addNewAddress?addressId=' + this.itemData.id,
+      })
+    },
+    async setDefaultAddress() {
+      let params = {
+        id: this.itemData.id,
+        isDefault: this.itemData.isDefault === 1 ? 0 : 1,
+      }
+      let res = await this.setAddressDefault(params)
+      if (res) {
+        this.$emit('setDefault')
+      }
+    },
+    async deleteAddress() {
+      let res = await this.addressDelete(this.itemData.id)
+      if (res) {
+        uni.showToast({
+          title: '删除成功',
+          icon: 'none',
+          duration: 2000,
+        })
+        this.$emit('delete')
+      }
+    },
+    selecAddressItem() {
+      this.$emit('selecAddressItem')
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -43,12 +92,16 @@ export default {
   margin-bottom: 13rpx;
   .item-top {
     display: flex;
+    justify-content: space-between;
     border-bottom: 1px solid #e8e8e8;
     padding-bottom: 17rpx;
     .top-left {
       display: flex;
       align-items: center;
+      flex: 1;
+      max-width: 668rpx;
       .item-icon {
+        min-width: 70rpx;
         width: 70rpx;
         height: 70rpx;
         background: #f6f5fa;
@@ -87,7 +140,7 @@ export default {
           font-family: PingFang SC;
           margin-top: 25rpx;
           .info-bottom-def {
-            width: 50rpx;
+            min-width: 50rpx;
             height: 28rpx;
             background: #f6f5fa;
             border-radius: 5rpx;
@@ -107,7 +160,7 @@ export default {
       }
     }
     .top-right {
-      margin-left: auto;
+      // margin-left: auto;
       display: flex;
       align-items: center;
       .line {
@@ -117,7 +170,6 @@ export default {
       }
       .edit {
         margin-left: 20rpx;
-        background-color: #8b8b8b;
         width: 24rpx;
         height: 24rpx;
       }
@@ -136,8 +188,6 @@ export default {
       .select {
         width: 20rpx;
         height: 20rpx;
-        border: 1px solid #8b8b8b;
-        border-radius: 50%;
         margin-right: 9rpx;
       }
       .text {

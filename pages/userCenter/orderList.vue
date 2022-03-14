@@ -1,6 +1,6 @@
 <template>
   <view class="container">
-    <van-tabs color='#63BAA6'
+    <van-tabs color='#0183FC'
               :active="active"
               line-width='38rpx'
               @change="onChange">
@@ -11,7 +11,7 @@
       </van-tab>
     </van-tabs>
     <view class="list">
-      <order-item v-for="(item,index) in goodsList"
+      <order-item v-for="(item,index) in orderList"
                   :key="index"
                   :orderItem='item'></order-item>
     </view>
@@ -19,6 +19,8 @@
 </template>
 <script>
 import orderItem from '../components/user/order-item.vue'
+import { mapState, mapActions, mapMutations } from 'vuex'
+
 export default {
   components: {
     'order-item': orderItem,
@@ -27,42 +29,69 @@ export default {
     return {
       active: 0,
       tabList: [
-        { state: 1, name: '全部' },
-        { state: 2, name: '待付款' },
-        { state: 3, name: '待发货' },
-        { state: 4, name: '待收货' },
+        { state: 100, name: '全部' },
+        { state: 0, name: '待付款' },
+        { state: 1, name: '待发货' },
+        { state: 2, name: '待收货' },
       ],
-      goodsList: [
-        {
-          id: 1,
-          goods_name: '【圣诞礼物】CHANEL香奈儿邂逅清新EAU F RAICHE女士淡香水',
-          count: 1,
-          property: '50ml',
-          price: '218.00',
-          stateTitle: '交易成功',
-        },
-        {
-          id: 2,
-          goods_name: '【圣诞礼物】CHANEL香奈儿邂逅清新EAU F RAICHE女士淡香水',
-          count: 1,
-          property: '50ml',
-          price: '218.00',
-          stateTitle: '交易成功',
-        },
-        {
-          id: 3,
-          goods_name: '【圣诞礼物】CHANEL香奈儿邂逅清新EAU F RAICHE女士淡香水',
-          count: 1,
-          property: '50ml',
-          price: '218.00',
-          stateTitle: '交易成功',
-        },
-      ],
+      pageNum: 1, //分页
+      isLastPage: false, //是否是最后一页
+      isLoading: false, //是否正在加载中
+      orderList: [],
+      currentState: 100, //100全部、0待付款、1待发货、2待收货 ,
+    }
+  },
+  onReachBottom: function () {
+    if (!this.isLastPage && !this.isLoading) {
+      this.pageNum = this.pageNum + 1
+      this.getOrderListData()
+    }
+  },
+  onPullDownRefresh: function () {
+    //下拉刷新
+    this.pageNum = 1
+    this.getOrderListData()
+    setTimeout(function () {
+      uni.stopPullDownRefresh()
+    }, 1000)
+  },
+  onLoad(query) {
+    this.currentState = +query.state
+    let index = this.tabList.findIndex((item) => {
+      return item.state === this.currentState
+    })
+    if (index > -1) {
+      this.active = index
+      this.pageNum = 1
+      this.getOrderListData()
     }
   },
   methods: {
+    ...mapActions(['getOrderList']),
+    async getOrderListData() {
+      uni.showLoading({ title: '加载中' })
+      let res = await this.getOrderList({
+        orderState: this.currentState,
+        pageNum: this.pageNum,
+      })
+      uni.hideLoading()
+      if (res) {
+        this.isLastPage = res.isLastPage
+        if (this.pageNum === 1) {
+          this.orderList = res.list
+        } else {
+          this.orderList = [...this.orderList, ...res.list]
+        }
+      }
+    },
     onChange(event) {
-      this.active = event.detail.index
+      let index = event.detail.index
+      if (index === this.active) return
+      this.orderList = []
+      this.active = index
+      this.currentState = this.tabList[index].state
+      this.pageNum = 1
+      this.getOrderListData()
     },
   },
 }

@@ -112,7 +112,7 @@ export default {
       margin-left: 29rpx;
     }
     .btn-bg {
-      background: #63baa6;
+      background: #0183fc;
     }
   }
 }

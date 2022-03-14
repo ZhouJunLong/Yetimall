@@ -66,7 +66,7 @@ export default {
   methods: {
     gotoGoodsDetail() {
       uni.navigateTo({
-        url: '/pages/home/goodsDeatil',
+        url: '/pages/home/goodsDeatil?id=' + this.cartItem.id,
       })
     },
     selectItem() {
@@ -123,7 +123,7 @@ export default {
       font-size: 26rpx;
       font-family: PingFang SC;
       font-weight: bold;
-      color: #63baa6;
+      color: #0183fc;
       text-align: right;
     }
   }

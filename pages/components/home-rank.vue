@@ -3,7 +3,7 @@
     <view class="rank-title">畅销榜</view>
     <view class="rank-list">
       <view class="rank-item"
-            @click="gotoDetail"
+            @click="gotoDetail(item.id)"
             v-for="(item,index) in rankList"
             :key="index">
         <view class="rank-item-title">No.{{index+1}}</view>
@@ -41,9 +41,9 @@ export default {
     },
   },
   methods: {
-    gotoDetail() {
+    gotoDetail(id) {
       uni.navigateTo({
-        url: '/pages/home/goodsDeatil',
+        url: '/pages/home/goodsDeatil?id=' + id,
       })
     },
   },

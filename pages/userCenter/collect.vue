@@ -11,7 +11,7 @@
             :key="index">
         <goodItemContent :orderItem='item'
                          :style="{marginTop:'0px'}"
-                         @gotoPage='gotoGoodsDetail'></goodItemContent>
+                         @gotoPage='gotoGoodsDetail(item.id)'></goodItemContent>
       </view>
     </view>
   </view>
@@ -53,9 +53,9 @@ export default {
     }
   },
   methods: {
-    gotoGoodsDetail() {
+    gotoGoodsDetail(id) {
       uni.navigateTo({
-        url: '/pages/home/goodsDeatil',
+        url: '/pages/home/goodsDeatil?id=' + id,
       })
     },
   },

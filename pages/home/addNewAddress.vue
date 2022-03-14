@@ -5,6 +5,7 @@
         <view class="item-title">收货人</view>
         <input class="item-des"
                type="text"
+               v-model="name"
                placeholder="请填写收货人姓名">
         <block></block>
       </view>
@@ -14,6 +15,7 @@
         <view class="item-phone">
           <view class="item-86">+86</view>
           <input class="item-des"
+                 v-model="phone"
                  type="number"
                  placeholder="请填写收货人手机号码">
         </view>
@@ -25,7 +27,7 @@
                type="text"
                placeholder="请选择收件地址（省、市、区）"> -->
         <view class="item-des">
-          <pickerAddress @change="change">{{ addressTxt }}</pickerAddress>
+          <pickerAddress @change="addressChange">{{ !addressTxt ? '请选择省市区' : addressTxt}}</pickerAddress>
         </view>
         <image class="arrow"
                src="../../static/images/home/arrow-right.png"></image>
@@ -33,13 +35,14 @@
       <view class="wrap-item">
         <view class="item-title">详细地址</view>
         <textarea class="item-des textarea"
+                  v-model="addressDetail"
                   type="text"
                   placeholder="例如街道、门牌号、小区、楼栋号、单元 室等"></textarea>
         <block></block>
       </view>
       <view class="wrap-item wrap-toggle">
         <view class="item-title">设为默认地址</view>
-        <van-switch :checked="checked"
+        <van-switch :checked="isDefault"
                     @change="onChange"></van-switch>
       </view>
     </view>
@@ -48,12 +51,14 @@
       <view class="wrap-item">
         <view class="item-title">真实姓名</view>
         <input class="item-des"
+               v-model="nameReal"
                type="text"
                placeholder="请填写与身份证对应的真实姓名">
       </view>
       <view class="wrap-item">
         <view class="item-title">身份证号</view>
         <input class="item-des"
+               v-model="identityCard"
                type="text"
                placeholder="请填写与真实姓名对应的身份证号">
       </view>
@@ -61,9 +66,11 @@
         <view class="card-title">身份正反面照片</view>
         <view class="card-con">
           <image class="card-img"
-                 src="../../static/images/home/idcard-qian.png"></image>
+                 @click="uploadCard(1)"
+                 :src="identityCardImgFront ? identityCardImgFront :'../../static/images/home/idcard-qian.png'"></image>
           <image class="card-img"
-                 src="../../static/images/home/idcard-hou.png"></image>
+                 @click="uploadCard(2)"
+                 :src=" identityCardImgBack ? identityCardImgBack :'../../static/images/home/idcard-hou.png'"></image>
         </view>
         <view class="card-tips">
           <image class="card-icon"
@@ -79,30 +86,125 @@
   </view>
 </template>
 <script>
+function toast(title) {
+  uni.showToast({
+    title: title,
+    icon: 'none',
+    duration: 1500,
+  })
+}
 import pickerAddress from '../components/wangding-pickerAddress/wangding-pickerAddress.vue'
+import { mapState, mapActions, mapMutations } from 'vuex'
+
 export default {
   components: {
     pickerAddress,
   },
   data() {
     return {
-      checked: false,
-      addressTxt: '请选择省市区', //所选地址
+      addressTxt: '', //所选地址
+      addressDetail: '', //详细地址
+      identityCard: '', //身份证号码
+      identityCardImgBack: '', //身份证反面
+      identityCardImgFront: '', //身份证正面
+      isDefault: false, //是否默认地址
+      name: '', //姓名
+      nameReal: '', //真实姓名
+      phone: '', //电话
+      userId: '',
+      zoneCode: '86', //区号 86
+      id: '',
+      isEdit: false,
+    }
+  },
+  computed: {
+    ...mapState(['editAddressInfo', 'addressEdit']),
+  },
+  onLoad(query) {
+    if (query.addressId) {
+      this.isEdit = true
+      this.id = query.addressId
+      uni.setNavigationBarTitle({
+        title: '编辑地址',
+      })
     }
   },
   methods: {
+    ...mapActions(['addressAdd', 'upload']),
     onChange({ detail }) {
-      this.checked = detail
+      this.isDefault = detail
     },
-    change(data) {
+    addressChange(data) {
       this.addressTxt = data.data.join(' ')
     },
-    saveAddress() {
-      uni.showToast({
-        title: '地址添加成功',
-        icon: 'none',
-        duration: 1500,
+    // 1正面，2反面
+    async uploadCard(type) {
+      let url = await this.upload()
+      if (!url) return
+      type === 1
+        ? (this.identityCardImgFront = url)
+        : (this.identityCardImgBack = url)
+    },
+    async saveAddress() {
+      if (!this.addressTxt) {
+        toast('请选择地址')
+      }
+      if (!this.addressDetail) {
+        toast('请输入详细地址')
+      }
+      if (!this.identityCard) {
+        toast('请输入身份证号码')
+      }
+      if (!this.identityCardImgFront) {
+        toast('请上传身份证正面')
+      }
+      if (!this.identityCardImgBack) {
+        toast('请上传身份证反面')
+      }
+      if (!this.nameReal) {
+        toast('请输入真实姓名')
+      }
+      //弹框提示
+      uni.showModal({
+        title: '提示',
+        content: '为避免无法清关，请确认身份证号码与真实姓名相匹配',
+        showCancel: true,
+        cancelText: '取消',
+        cancelColor: '#666666',
+        confirmText: '确定',
+        confirmColor: '#57D0D9',
+        success: (res) => {
+          if (res.confirm) {
+            this.saveSubmit()
+          }
+        },
       })
+    },
+    async saveSubmit() {
+      let params = {
+        address: this.addressTxt,
+        addressDetail: this.addressDetail,
+        identityCard: this.identityCard,
+        identityCardImgBack: this.identityCardImgBack,
+        identityCardImgFront: this.identityCardImgFront,
+        isDefault: this.isDefault ? 1 : 0,
+        name: this.name,
+        nameReal: this.nameReal,
+        phone: this.phone,
+        zoneCode: this.zoneCode,
+      }
+      let res = false
+      if (this.isEdit) {
+        params.id = this.id
+        res = await this.addressEdit(params)
+      } else {
+        res = await this.addressAdd(params)
+      }
+      if (res) {
+        uni.navigateBack({
+          delta: 1,
+        })
+      }
     },
   },
 }
@@ -230,7 +332,7 @@ export default {
   .btn {
     height: 81rpx;
     line-height: 81rpx;
-    background: #63baa6;
+    background: #0183fc;
     text-align: center;
     font-size: 26rpx;
     font-family: PingFang SC;

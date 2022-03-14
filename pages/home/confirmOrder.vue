@@ -12,17 +12,18 @@
             @click="selectAddress"
             v-else>
         <view class="address-top">
-          <view class="top-btn">默认</view>
-          <view class="top-des">河南省 郑州市 金水区</view>
+          <view class="top-btn"
+                v-if="addressItem.isDefault">默认</view>
+          <view class="top-des">{{ addressItem.address }}</view>
         </view>
         <view class="address-center">
-          <view class="center-left">东风路沙口路菜鸟驿站</view>
+          <view class="center-left">{{ addressItem.addressDetail }}</view>
           <image class="arrow"
                  src="../../static/images/home/arrow-right.png"></image>
         </view>
         <view class="address-des">
-          <view class="name">鹿聪明</view>
-          <view class="phone">156****2647</view>
+          <view class="name">{{ addressItem.name }}</view>
+          <view class="phone">{{ addressItem.phone }}</view>
         </view>
 
       </view>
@@ -34,19 +35,23 @@
         <view class="line"></view>
         <view class="time">约3天到货</view>
       </view>
-      <view class="goods-detail">
-        <image class="detail-pic"
-               src="../../static/temp/shop-good.png"></image>
-        <view class="detail-info">
-          <view class="title">【新年礼物】林允儿同款mac口红色号 #024</view>
-          <view class="info">
-            <view class="spec">口红</view>
-            <view class="num">数量 x1</view>
+      <view class="goods-detail"
+            v-for="(item,index) in orderGoodsInfoVoList"
+            :key="index">
+        <view class="detail-left">
+          <image class="detail-pic"
+                 src="../../static/temp/shop-good.png"></image>
+          <view class="detail-info">
+            <view class="title">{{item.name}}</view>
+            <view class="info">
+              <view class="spec">{{item.property}}</view>
+              <view class="num">数量 x{{ item.count}}</view>
+            </view>
           </view>
         </view>
         <view class="price">
           <view class="price-icon">¥</view>
-          <view class="price-num">218.00</view>
+          <view class="price-num">{{ item.price }}</view>
         </view>
       </view>
       <view class="line line1"></view>
@@ -75,8 +80,11 @@
       </view>
       <view class="line line2"></view>
       <view class="total">
-        <view class="total-des">共一件 小计：</view>
-        <view class="total-price">¥218.00</view>
+        <view class="total-des"
+              v-if="orderGoodsData.orderNum">共{{orderGoodsData.orderNum}}件 小计：</view>
+        <view class="total-des"
+              v-else>小计：</view>
+        <view class="total-price">¥{{orderGoodsData.orderPricePay}}</view>
       </view>
     </view>
     <view class="statement">
@@ -93,13 +101,16 @@
           :style="safeBottom">
       <view class="bottom-left">
         <view class="bottom-left-top">
-          <view class="des">共1件 | 合计：</view>
+          <view v-if="orderGoodsData.orderNum"
+                class="des">共{{orderGoodsData.orderNum}}件 | 合计：</view>
+          <view class="des"
+                v-else>合计：</view>
           <view class="price">
             <view class="price-icon">¥</view>
-            <view class="price-num">218.00</view>
+            <view class="price-num">{{orderGoodsData.orderPricePay}}</view>
           </view>
         </view>
-        <view class="bottom-left-bottom">优惠：¥15.00</view>
+        <view class="bottom-left-bottom">优惠：¥{{ orderGoodsData.orderPricePreferential || 0}}</view>
       </view>
       <view class="btn"
             @click="sumitOrder">提交订单</view>
@@ -108,28 +119,91 @@
 </template>
 <script>
 import tools from '../../common/tools.js'
+import { mapState, mapActions, mapMutations } from 'vuex'
+
 export default {
   data() {
     return {
       safeBottom: '',
-      hasAddress: true,
+      addressItem: null,
+      orderGoodsInfoVoList: [],
+      orderGoodsData: null,
     }
   },
-  onLoad() {
+  async onLoad() {
     let safeBottom = tools.getSafeAreaBottom() + 20
     this.safeBottom = `padding-bottom:${safeBottom}rpx`
+
+    let params = uni.getStorageSync('orderConfirmInfo')
+    if (!params) return
+    let orderData = await this.orderConfirm(params)
+    if (orderData) {
+      this.orderGoodsData = orderData
+      this.orderGoodsInfoVoList = orderData.orderGoodsInfoVoList || []
+    }
+  },
+  async onShow() {
+    if (this.currentSelectedAddress) {
+      this.addressItem = this.currentSelectedAddress
+    } else {
+      let res = await this.getAddressDefault()
+      if (res) {
+        this.addressItem = (res.list && res.list[0]) || null
+      }
+    }
+  },
+  computed: {
+    ...mapState(['orderConfirmInfo', 'currentSelectedAddress']),
+    hasAddress() {
+      return this.addressItem
+    },
   },
   methods: {
+    ...mapActions(['getAddressDefault', 'orderConfirm', 'submitOrder']),
+    ...mapMutations(['setStateByKey']),
     selectAddress() {
       uni.navigateTo({
-        url: '/pages/home/addressList',
+        url: '/pages/home/addressList?cb=1',
       })
     },
-    sumitOrder() {
-      uni.redirectTo({
-        url: '/pages/home/paySuccess',
+    async sumitOrder() {
+      if (!this.addressItem.id) {
+        uni.showToast({
+          title: '请选择地址',
+          icon: 'none',
+          duration: 2000,
+        })
+        return
+      }
+      let orderGoodsList = []
+      this.orderGoodsInfoVoList.forEach((item) => {
+        let obj = {
+          count: item.count || 1,
+          id: item.id,
+        }
+        item.propertyId && (obj.goodsPropertyId = item.propertyId)
+        orderGoodsList.push(obj)
       })
+      let params = {
+        addressId: this.addressItem.id,
+        additionalOrderGoodsList: [],
+        orderGoodsList: orderGoodsList,
+        payTypeId: 1,
+        couponId: 0,
+        couponPrice: 0,
+      }
+      let res = await this.submitOrder(params)
+      if (res) {
+        uni.redirectTo({
+          url: '/pages/home/paySuccess?oid=' + res.id,
+        })
+      }
     },
+  },
+  destroyed() {
+    this.setStateByKey({
+      orderConfirmInfo: null,
+    })
   },
 }
 </script>
@@ -261,34 +335,40 @@ export default {
       margin-top: 57rpx;
       display: flex;
       justify-content: space-between;
+      align-items: center;
       color: #252525;
-      .detail-pic {
-        width: 122rpx;
-        height: 122rpx;
-        margin-right: 29rpx;
-      }
-      .detail-info {
+      .detail-left {
         display: flex;
-        flex-direction: column;
-        max-width: 407rpx;
-        .title {
-          font-size: 24rpx;
-          font-family: PingFang-SC-Bold, PingFang-SC;
-          font-weight: bold;
+        align-items: center;
+        .detail-pic {
+          width: 122rpx;
+          height: 122rpx;
+          margin-right: 29rpx;
         }
-        .info {
-          font-size: 22rpx;
-          font-family: PingFang-SC-Medium, PingFang-SC;
-          color: #8b8b8b;
+        .detail-info {
           display: flex;
-          margin-top: 20rpx;
-          .spec {
-            margin-right: 20rpx;
+          flex-direction: column;
+          max-width: 407rpx;
+          .title {
+            font-size: 24rpx;
+            font-family: PingFang-SC-Bold, PingFang-SC;
+            font-weight: bold;
           }
-          .num {
+          .info {
+            font-size: 22rpx;
+            font-family: PingFang-SC-Medium, PingFang-SC;
+            color: #8b8b8b;
+            display: flex;
+            margin-top: 20rpx;
+            .spec {
+              margin-right: 20rpx;
+            }
+            .num {
+            }
           }
         }
       }
+
       .price {
         display: flex;
         font-family: PingFang-SC-Heavy, PingFang-SC;
@@ -431,7 +511,7 @@ export default {
       height: 70rpx;
       text-align: center;
       line-height: 70rpx;
-      background: #63baa6;
+      background: #0183fc;
       border-radius: 5rpx 5rpx 5rpx 5rpx;
       font-size: 26rpx;
       font-family: PingFang-SC-Bold, PingFang-SC;

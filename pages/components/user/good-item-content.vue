@@ -5,17 +5,17 @@
     <view class="good_item"
           :style="style">
       <image class="good_item_pic"
-             src="../../../static/temp/rank-shop.png"></image>
+             :src="orderItem.goodsImgUrl"></image>
       <view class="good_item_right">
-        <view class="good_item_title">{{ orderItem.goods_name }}</view>
+        <view class="good_item_title">{{ orderItem.goodsName }}</view>
         <view class="good_item_des">
-          <view class="good_item_des_spec">{{ orderItem.property && orderItem.property[0].value || '默认' }}</view>
-          <view class="good_item_num">数量：x{{ orderItem.count }}</view>
+          <view class="good_item_des_spec">{{ orderItem.goodsPropertyName || '默认' }}</view>
+          <view class="good_item_num">数量：x{{ orderItem.goodsCount }}</view>
         </view>
         <view class="item-bottom">
           <view class="good_item_price">
             <text class="good_item_price_type">¥</text>
-            <text class="good_item_price_num">{{ orderItem.price }}</text>
+            <text class="good_item_price_num">{{ orderItem.orderPricePay }}</text>
           </view>
         </view>
       </view>

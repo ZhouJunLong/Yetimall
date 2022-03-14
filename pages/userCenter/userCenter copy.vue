@@ -175,7 +175,7 @@ export default {
               .left-id {
                 width: 28rpx;
                 height: 28rpx;
-                background: #63baa6;
+                background: #0183fc;
                 border-radius: 50%;
                 font-size: 20rpx;
                 font-weight: 800;
@@ -200,7 +200,7 @@ export default {
           .info-right {
             width: 143rpx;
             height: 57rpx;
-            background: #63baa6;
+            background: #0183fc;
             border-radius: 5rpx;
             font-weight: bold;
             color: #fefefe;
@@ -293,7 +293,7 @@ export default {
                 color: #ffffff;
               }
               .text-sel {
-                color: #63baa6;
+                color: #0183fc;
               }
             }
           }
@@ -301,7 +301,7 @@ export default {
             font-size: 22rpx;
             font-family: PingFang SC;
             font-weight: 500;
-            color: #63baa6;
+            color: #0183fc;
           }
         }
       }
@@ -314,7 +314,7 @@ export default {
       font-size: 26rpx;
       font-family: FZHanZhenGuangBiaoS-GB;
       font-weight: bold;
-      color: #63baa6;
+      color: #0183fc;
       text-align: center;
       //  background-color: #f3f6f9;
     }

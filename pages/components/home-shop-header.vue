@@ -8,10 +8,9 @@
           @click="clickType(1)">
       <view :class="currentOrderByType == 1 ? 'active-selected' : ''">价格</view>
       <view class="sort">
-        <image class="sort-icon rotate"
-               src="../../static/images/home/sort.png"></image>
+
         <image class="sort-icon"
-               src="../../static/images/home/sort.png"></image>
+               :src="prcieImg"></image>
 
       </view>
     </view>
@@ -23,10 +22,8 @@
           @click="clickType(3)">
       <view :class="currentOrderByType == 3 ? 'active-selected' : ''">销量</view>
       <view class="sort">
-        <image class="sort-icon rotate"
-               src="../../static/images/home/sort.png"></image>
         <image class="sort-icon"
-               src="../../static/images/home/sort.png"></image>
+               :src="saleImg"></image>
 
       </view>
     </view>
@@ -40,7 +37,34 @@ export default {
     return {
       currentOrderByType: 0,
       orderByTypeT: 1,
+      defaultSortImg: '../../static/images/home/sort-icon-1.png',
+      upSortImg: '../../static/images/home/sort-icon-2.png',
+      dowmSortImg: '../../static/images/home/sort-icon-3.png',
     }
+  },
+  computed: {
+    prcieImg() {
+      if (this.currentOrderByType !== 1) {
+        return this.defaultSortImg
+      }
+      if (this.orderByTypeT === 1) {
+        return this.upSortImg
+      }
+      if (this.orderByTypeT === 2) {
+        return this.dowmSortImg
+      }
+    },
+    saleImg() {
+      if (this.currentOrderByType !== 3) {
+        return this.defaultSortImg
+      }
+      if (this.orderByTypeT === 1) {
+        return this.upSortImg
+      }
+      if (this.orderByTypeT === 2) {
+        return this.dowmSortImg
+      }
+    },
   },
   methods: {
     clickType(currentOrderByType) {
@@ -77,10 +101,7 @@ export default {
     }
     .sort-icon {
       height: 24rpx;
-      width: 10rpx;
-    }
-    .rotate {
-      transform: rotate(180deg);
+      width: 26rpx;
     }
   }
   .active-selected {

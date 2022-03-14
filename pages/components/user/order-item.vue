@@ -1,7 +1,7 @@
 <template>
   <view class="cart-item">
     <view class="title-wrap">
-      <view class="title-text">{{ orderItem.stateTitle }}</view>
+      <view class="title-text">{{ orderItem.orderStateText }}</view>
     </view>
     <goodItemContent :orderItem='orderItem'
                      @gotoPage='gotoOrderDetail'></goodItemContent>
@@ -32,7 +32,7 @@ export default {
   methods: {
     gotoOrderDetail() {
       uni.navigateTo({
-        url: '/pages/home/orderDetail',
+        url: '/pages/home/orderDetail?oid=' + this.orderItem.orderId,
       })
     },
     selectItem() {
@@ -178,7 +178,7 @@ export default {
   .bg-btn {
     color: #ffffff;
 
-    background: #63baa6;
+    background: #0183fc;
   }
 }
 </style>

@@ -26,6 +26,9 @@ export default {
   components: {
     'good-card': goodCard,
   },
+  onLoad(options) {
+    this.oid = options.oid
+  },
   methods: {
     gotoHome() {
       uni.switchTab({
@@ -34,7 +37,7 @@ export default {
     },
     gotoOrderDetail() {
       uni.navigateTo({
-        url: '/pages/home/orderDetail',
+        url: '/pages/home/orderDetail?oid=' + this.oid,
       })
     },
   },
@@ -58,7 +61,7 @@ export default {
       font-size: 38rpx;
       font-family: PingFang SC;
       font-weight: bold;
-      color: #63baa6;
+      color: #0183fc;
     }
     .btn-groups {
       display: flex;
@@ -82,7 +85,7 @@ export default {
       .bg-btn {
         color: #ffffff;
 
-        background: #63baa6;
+        background: #0183fc;
       }
     }
   }

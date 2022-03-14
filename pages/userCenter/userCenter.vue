@@ -48,7 +48,10 @@
       <!-- 去查看订单状态 -->
       <user-order-state></user-order-state>
       <view class="recommed">
-        <view class="title">为您推荐</view>
+        <view class="title">
+          <image class="title-img"
+                 src='../../static/images/user/user-recommon.png'></image>
+        </view>
         <view class="shop-goods">
           <good-card v-for="(item,index) in 10"
                      :key="index"></good-card>
@@ -67,7 +70,7 @@ export default {
   },
   data() {
     return {
-      isAuthorize: false,
+      isAuthorize: true,
       stateList: [
         { state: 1, title: '待付款', icon: 'state-1', iconWidth: '52rpx' },
         { state: 2, title: '待发货', icon: 'state-2', iconWidth: '47rpx' },
@@ -82,10 +85,18 @@ export default {
       return this.isAuthorize ? '账户设置' : '授权登陆'
     },
   },
+  onLoad() {},
   methods: {
     clickAccount() {
+      //   这里其实应该从userInfo中取
+      const tokenInfo = uni.getStorageSync('tokenInfo')
+      let phone = tokenInfo.telephone || ''
       if (!this.isAuthorize) {
         this.isAuthorize = true
+      } else if (phone) {
+        uni.navigateTo({
+          url: '/pages/userCenter/accountManage',
+        })
       } else {
         uni.navigateTo({
           url: '/pages/userCenter/bindMobile',
@@ -105,7 +116,7 @@ export default {
 .userCenter {
   .header-bg {
     height: 312rpx;
-    background: #63baa6;
+    background: #0183fc;
     padding-bottom: 0;
     display: flex;
     flex-direction: column;
@@ -153,7 +164,7 @@ export default {
           border-radius: 50%;
           font-size: 20rpx;
           font-weight: 800;
-          color: #63baa6;
+          color: #0183fc;
           text-align: center;
           line-height: 28rpx;
           margin-right: 3rpx;
@@ -196,7 +207,7 @@ export default {
         font-size: 26rpx;
         font-family: PingFang SC;
         font-weight: bold;
-        color: #63baa6;
+        color: #0183fc;
       }
     }
   }
@@ -244,7 +255,7 @@ export default {
               color: #ffffff;
             }
             .text-sel {
-              color: #63baa6;
+              color: #0183fc;
             }
           }
         }
@@ -252,20 +263,21 @@ export default {
           font-size: 22rpx;
           font-family: PingFang SC;
           font-weight: 500;
-          color: #63baa6;
+          color: #0183fc;
         }
       }
     }
     .recommed {
       .title {
+        width: 100%;
         height: 88rpx;
-        line-height: 88rpx;
-        font-size: 26rpx;
-        font-family: FZHanZhenGuangBiaoS-GB;
-        font-weight: bold;
-        color: #63baa6;
-        text-align: center;
-        //  background-color: #f3f6f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .title-img {
+          width: 195rpx;
+          height: 25rpx;
+        }
       }
     }
     .shop-goods {

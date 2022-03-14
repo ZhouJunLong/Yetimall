@@ -4,21 +4,29 @@ const tools = {
 	/**
 	 * request请求
 	 */
-	httpClient(url,data) {
+	httpClient(url,data,isShowToast = false) {
+	 const tokenInfo = uni.getStorageSync('tokenInfo');
 		return new Promise((resolve,reject)=>{
 			uni.request({
 				url: base_url + url,
 				data: data,
 				header: {
 					"Content-Type": "application/json",
-					'Authorization':"Bearer " //+ openid
+					'Authorization':"Bearer " + tokenInfo.accessToken || ''
 				},
 				method: "POST",
 				dataType: 'json',
 				success: function ( res ) {
-					if(res.statusCode === 200){
-						resolve(res.data.data)
+					if(res.statusCode === 200 && res.data.statusCode === 200){
+						resolve(res.data.data || '成功')
 					}else{
+						if(isShowToast && res.data.message){
+							uni.showToast({
+								title: res.data.message,
+								icon: 'none',
+								duration: 2000,
+							  })
+						}
 						reject(res)
 					}
 				},
@@ -29,8 +37,44 @@ const tools = {
 		})
 		
 	},
-	
-	
+	uploadImage(url,isShowToast = false){
+		const tokenInfo = uni.getStorageSync('tokenInfo');
+		return new Promise((resolve,reject)=>{
+			wx.chooseImage({
+				success (res) {
+				  const tempFilePaths = res.tempFilePaths
+				  wx.uploadFile({
+					url: base_url + url,
+					filePath: tempFilePaths[0],
+					header: {
+						"Content-Type": "application/json",
+						'Authorization':"Bearer " + tokenInfo.accessToken || ''
+					},
+					name: 'file',
+					formData: {
+					//   'user': 'test'
+					},
+					success (res){
+						console.log('---res--img-',JSON.parse(res.data).statusCode);
+						let data = JSON.parse(res.data)
+						if(res.statusCode === 200 && data.statusCode === 200){
+							resolve(data.data)
+						}else{
+							if(isShowToast && data.message){
+								uni.showToast({
+									title: res.data.message,
+									icon: 'none',
+									duration: 2000,
+								  })
+							}
+							reject(res)
+						}
+					}
+				  })
+				}
+			  })
+		})
+	},
 	/**
 	 * 判断微信授权
 	 */
@@ -76,7 +120,6 @@ const tools = {
 		const systemInfo = wx.getSystemInfoSync()
 		const { screenHeight } = systemInfo;
 		const { bottom } = systemInfo.safeArea
-        console.log('---2222---',bottom);
 		return screenHeight - bottom
 	},
 	// 手机号隐藏中间四位

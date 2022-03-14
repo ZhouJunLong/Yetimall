@@ -9,7 +9,9 @@
       <view class="mobile-input">
         <view class="text">+86</view>
         <input class="input"
+               v-model="smsSendMobiles"
                type="text"
+               maxlength="11"
                placeholder="请输入手机号码">
       </view>
       <image class="mobile-input-img"
@@ -17,7 +19,7 @@
 
     </view>
     <view class="btn-wrap"
-          @click="jumpCode">
+          @click="getSendCode">
       <text class="btn-text">获取验证码</text>
     </view>
     <image class="tips"
@@ -25,11 +27,31 @@
   </view>
 </template>
 <script>
+import { mapState, mapActions } from 'vuex'
+
 export default {
   data() {
-    return {}
+    return {
+      smsSendMobiles: '',
+      smsSendZone: 86,
+    }
   },
   methods: {
+    ...mapActions(['sendCode', 'sendTest']),
+    async getSendCode() {
+      if (!this.smsSendMobiles || this.smsSendMobiles.length !== 11) {
+        uni.showToast({
+          title: '请完善手机号',
+          icon: 'none',
+          duration: 2000,
+        })
+        return
+      }
+      let res = await this.sendCode(this.smsSendMobiles)
+      if (res && res.smsCode) {
+        this.jumpCode()
+      }
+    },
     jumpCode() {
       uni.redirectTo({
         url: '/pages/userCenter/phoneCode',
@@ -52,7 +74,7 @@ page {
   .logo {
     width: 168rpx;
     height: 168rpx;
-    background-color: #63baa6;
+    background-color: #0183fc;
     margin-top: 140rpx;
   }
   .yeye {
@@ -106,7 +128,7 @@ page {
     margin-top: 29rpx;
     width: 516rpx;
     height: 83rpx;
-    background-color: #63baa6;
+    background-color: #0183fc;
     border-radius: 42rpx;
     display: flex;
     align-items: center;

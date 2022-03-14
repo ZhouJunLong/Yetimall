@@ -1,7 +1,10 @@
 
+function hasOwn(obj,key){
+    return Object.prototype.hasOwnProperty.call(obj,key)
+}
 const setStateByKey =(state,data) =>{
     Object.keys(data).forEach((e)=>{
-        if(state.hasOwnProerty(e)){
+        if(hasOwn(state,e)){
             state[e] = data[e]
         }else{
             if(/\.|\[|\]/.test(e)){
@@ -13,6 +16,6 @@ const setStateByKey =(state,data) =>{
     })
 }
 
-export default{
+export  default{
     setStateByKey
-}
+} 

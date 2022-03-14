@@ -26,21 +26,21 @@ export default {
     return {
       stateList: [
         {
-          state: 1,
+          state: 0,
           title: '待付款',
           icon: 'state-1',
           iconWidth: '52rpx',
+          jumpUrl: '/pages/userCenter/orderList?state=0',
+        },
+        {
+          state: 1,
+          title: '待发货',
+          icon: 'state-2',
+          iconWidth: '47rpx',
           jumpUrl: '/pages/userCenter/orderList?state=1',
         },
         {
           state: 2,
-          title: '待发货',
-          icon: 'state-2',
-          iconWidth: '47rpx',
-          jumpUrl: '/pages/userCenter/orderList?state=2',
-        },
-        {
-          state: 3,
           title: '待收货',
           icon: 'state-3',
           iconWidth: '52rpx',
@@ -65,7 +65,7 @@ export default {
     },
     gotoOrderList() {
       uni.navigateTo({
-        url: '/pages/userCenter/orderList',
+        url: '/pages/userCenter/orderList?state=100',
       })
     },
   },
