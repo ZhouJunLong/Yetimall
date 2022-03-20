@@ -13,7 +13,7 @@
             <view class="price-icon">¥</view>
             <view class="price-num">{{ goodDetail.price }}</view>
           </view>
-          <view class="info-top-right">已售{{goodDetail.saleQuantity}}件</view>
+          <view class="info-top-right">已售{{goodDetail.saleQuantity || 0}}件</view>
         </view>
         <view class="info-center">
           {{goodDetail.name}}
@@ -108,8 +108,10 @@
                type="bottom">
       <spec :goodsId='goodsId'
             :isStandard='isStandard'
+            :isAddCart='isAddCart'
             @close="closeHandle"
-            @gotoBuy="gotoBuyHandle"></spec>
+            @gotoBuy="gotoBuyHandle"
+            @gotoAddCart="gotoAddCartHandle"></spec>
     </uni-popup>
   </view>
 </template>
@@ -127,6 +129,7 @@ export default {
       isStandard: 0,
       goodDetail: null,
       showSpec: false,
+      isAddCart: false,
     }
   },
   components: {
@@ -156,7 +159,7 @@ export default {
     this.isStandard = this.goodDetail.isStandard
   },
   methods: {
-    ...mapActions(['getGoodsDetail', 'getGoodsInventory']),
+    ...mapActions(['getGoodsDetail', 'getGoodsInventory', 'addGoodsCart']),
     async gotoBuyHandle(params) {
       this.closeHandle()
       if (!params) return
@@ -168,14 +171,37 @@ export default {
         })
       }
     },
+    async gotoAddCartHandle(params) {
+      this.closeHandle()
+      let res = await this.addGoodsCart(params)
+      if (res) {
+        uni.showToast({
+          title: '加入购物车成功',
+          icon: 'none',
+          duration: 2000,
+        })
+      }
+    },
     addCart() {
-      uni.showToast({
-        title: '加入购物车成功',
-        icon: 'none',
-        duration: 2000,
+      this.isAddCart = true
+      this.showSpec = !!this.isStandard
+      this.$nextTick(() => {
+        this.isStandard && this.$refs.popup.open('bottom')
       })
+      if (!this.isStandard) {
+        let params = {
+          orderGoodsList: [
+            {
+              count: 1,
+              id: this.goodDetail.id,
+            },
+          ],
+        }
+        this.gotoAddCartHandle(params)
+      }
     },
     gotoConfirm() {
+      this.isAddCart = false
       this.showSpec = !!this.isStandard
       this.$nextTick(() => {
         this.isStandard && this.$refs.popup.open('bottom')

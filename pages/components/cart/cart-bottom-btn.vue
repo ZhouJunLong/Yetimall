@@ -1,22 +1,29 @@
 <template>
   <view class="bottom">
-    <view class="bottom-select">
-      <image class="select-icon"></image>
+    <view class="bottom-select"
+          @click="selectAll">
+      <image class="title-icon"
+             v-if="!isSelectedAll"
+             src='../../../static/images/home/no-selected-icon.png'></image>
+      <image class="title-icon"
+             v-else
+             src='../../../static/images/home/selected-icon.png'></image>
       <view class="select-text">全选</view>
     </view>
     <view class="bottom-right">
       <view class="bottom-info"
             v-if="!isDelete">
         <view class="info-top">
-          <view class="info-top-txt">共{{ totalCartInfo.totalCount }}件 | 合计：</view>
+          <view class="info-top-txt">共{{ goods_counts }}件 | 合计：</view>
           <view class="info-top-price">
             <view class="price-icon">¥</view>
-            <view class="price-num">{{ totalCartInfo.totalPrice }}</view>
+            <view class="price-num">{{ totalPrice }}</view>
           </view>
         </view>
-        <view class="info-bottom">优惠：¥15.00</view>
+        <view class="info-bottom">优惠：¥{{pricePreferential}}</view>
       </view>
-      <view class="btn btn-bg">{{ btnText }}</view>
+      <view class="btn btn-bg"
+            @click="submitOrder">{{ btnText }}</view>
     </view>
   </view>
 </template>
@@ -35,20 +42,43 @@ export default {
         totalCount: 0,
       },
     },
+    pricePreferential: {
+      type: Number,
+      default: 0,
+    },
+    goods_counts: {
+      type: Number,
+      default: 0,
+    },
+    totalPrice: {
+      type: Number,
+      default: 0,
+    },
+    isSelectedAll: {
+      type: Boolean,
+      default: false,
+    },
   },
   computed: {
     btnText() {
       return this.isDelete ? '删除商品' : '立即结算'
     },
   },
-  created() {},
-  methods: {},
+  methods: {
+    selectAll() {
+      this.$emit('selectAll', !this.isSelectedAll)
+    },
+    submitOrder() {
+      this.$emit('submitOrder')
+    },
+  },
 }
 </script>
 <style lang="scss" scoped>
 .bottom {
   background-color: #fff;
   position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
   padding: 19rpx 31rpx 19rpx 28rpx;
@@ -60,12 +90,10 @@ export default {
   .bottom-select {
     display: flex;
     align-items: center;
-    .select-icon {
+    .title-icon {
       width: 28rpx;
       height: 28rpx;
-      border: 1px solid #8b8b8b;
-      border-radius: 50%;
-      margin-right: 6rpx;
+      margin-right: 11rpx;
     }
     .select-text {
       font-size: 24rpx;

@@ -12,7 +12,8 @@
         </view>
         <view class="title-text">YEYE平台直邮</view>
       </view>
-      <view class="title-right">删除</view>
+      <view class="title-right"
+            @click="deleteItem">删除</view>
     </view>
     <view class="item-con"
           @click="gotoGoodsDetail">
@@ -20,10 +21,10 @@
         <image class="good_item_pic"
                src="../../../static/temp/rank-shop.png"></image>
         <view class="good_item_right">
-          <view class="good_item_title">{{ cartItem.goods_name }}</view>
+          <view class="good_item_title">{{ cartItem.goodsName }}</view>
           <view class="good_item_des">
-            <view class="good_item_des_spec">{{ cartItem.property && cartItem.property[0].value || '默认' }}</view>
-            <view class="good_item_num">数量：x{{ cartItem.count }}</view>
+            <view class="good_item_des_spec">{{ cartItem.property  || '默认' }}</view>
+            <view class="good_item_num">数量：x{{ cartItem.goodsCount }}</view>
           </view>
           <view class="item-bottom">
             <view class="good_item_price">
@@ -33,7 +34,7 @@
             <view class="edit-num">
               <view class="edit-btn"
                     @click.stop="changeCount(1)">-</view>
-              <text class="edit-text">{{ cartItem.count }}</text>
+              <text class="edit-text">{{ cartItem.goodsCount }}</text>
               <view class="edit-btn"
                     @click.stop="changeCount(2)">+</view>
             </view>
@@ -62,11 +63,11 @@ export default {
       isSelected: false,
     }
   },
-  created() {},
+  computed: {},
   methods: {
     gotoGoodsDetail() {
       uni.navigateTo({
-        url: '/pages/home/goodsDeatil?id=' + this.cartItem.id,
+        url: '/pages/home/goodsDeatil?id=' + this.cartItem.goodsId,
       })
     },
     selectItem() {
@@ -78,7 +79,7 @@ export default {
      * type 1减少  2增加
      */
     changeCount(type) {
-      let count = this.cartItem.count
+      let count = this.cartItem.goodsCount
       if (type === 1) {
         count = count - 1 > 1 ? count - 1 : 1
       } else {
@@ -86,6 +87,24 @@ export default {
       }
       // 请求接口 返回成功后才赋值
       this.$emit('changeCartData', this.cartItem.id, count)
+    },
+    deleteItem() {
+      //弹框提示
+      uni.showModal({
+        title: '提示',
+        content: '是否删除该商品',
+        showCancel: true,
+        cancelText: '取消',
+        cancelColor: '#666666',
+        confirmText: '确定',
+        confirmColor: '#57D0D9',
+        success: (res) => {
+          if (res.confirm) {
+            this.$emit('delGoodsCart', [this.cartItem.id])
+          } else if (res.cancel) {
+          }
+        },
+      })
     },
   },
 }

@@ -55,7 +55,6 @@ const tools = {
 					//   'user': 'test'
 					},
 					success (res){
-						console.log('---res--img-',JSON.parse(res.data).statusCode);
 						let data = JSON.parse(res.data)
 						if(res.statusCode === 200 && data.statusCode === 200){
 							resolve(data.data)

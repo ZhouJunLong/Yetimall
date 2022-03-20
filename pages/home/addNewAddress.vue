@@ -118,7 +118,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['editAddressInfo', 'addressEdit']),
+    ...mapState(['editAddressInfo']),
   },
   onLoad(query) {
     if (query.addressId) {
@@ -127,15 +127,31 @@ export default {
       uni.setNavigationBarTitle({
         title: '编辑地址',
       })
+      this.getInfo()
     }
   },
   methods: {
-    ...mapActions(['addressAdd', 'upload']),
+    ...mapActions(['addressAdd', 'upload', 'getAddressInfo', 'addressEdit']),
     onChange({ detail }) {
       this.isDefault = detail
     },
     addressChange(data) {
       this.addressTxt = data.data.join(' ')
+    },
+    async getInfo() {
+      let res = await this.getAddressInfo(this.id)
+      if (res) {
+        this.addressTxt = res.address || ''
+        this.addressDetail = res.addressDetail || '' //详细地址
+        this.identityCard = res.identityCard || '' //身份证号码
+        this.identityCardImgBack = res.identityCardImgBack || '' //身份证反面
+        this.identityCardImgFront = res.identityCardImgFront || '' //身份证正面
+        this.isDefault = !!res.isDefault //是否默认地址
+        this.name = res.name || '' //姓名
+        this.nameReal = res.nameReal || '' //真实姓名
+        this.phone = res.phone || '' //电话
+        this.zoneCode = res.zoneCode || '86' //区号 86
+      }
     },
     // 1正面，2反面
     async uploadCard(type) {

@@ -77,7 +77,7 @@ const getHomeInfo = async ({},categoryId = 0) =>{
  const sendCode = async ({state,commit},{smsSendMobiles,smsSendZone=86}) =>{
     try {
        let res = await tools.httpClient(API.SEND_CODE,{smsSendMobiles,smsSendZone},true)
-       if(res && res.smsCode){
+       if(res){
         commit('setStateByKey',{
             smsSendMobiles,
             sendCodeInfo:res
@@ -88,6 +88,7 @@ const getHomeInfo = async ({},categoryId = 0) =>{
         return false
     }
 }
+
 
 
 /**
@@ -250,7 +251,7 @@ const getHomeInfo = async ({},categoryId = 0) =>{
     }
  }
  /**
-  * 订单列表
+  * 订单详情
   * @param {*} param0 
   */
   const getOrderInfo = async ({state,commit},orderId) =>{
@@ -264,6 +265,141 @@ const getHomeInfo = async ({},categoryId = 0) =>{
        return res
     } catch (error) {
         return false
+    }
+ }
+ /**
+  * 添加购物车
+  * @param {*} param0 
+  */
+  const addGoodsCart = async ({state,commit},params) =>{
+    try {
+       let res = await tools.httpClient(API.ADD_GOODS_CART,params,true)
+       return true
+    } catch (error) {
+        return false
+    }
+ }
+ /**
+  * 购物车列表
+  * @param {*} param0 
+  */
+  const getGoodsCartList = async ({state,commit},pageNum) =>{
+    const tokenInfo = uni.getStorageSync('tokenInfo')
+    let data = {
+        pageNum,
+        userId:tokenInfo.id,
+        pageSize:20
+    }
+     try {
+        let res = await tools.httpClient(API.GET_CART_LIST,data,true)
+        return res
+     } catch (error) {
+        return false
+     }
+ }
+ /**
+  * 删除购物车
+  * @param {*} param0 
+  */
+  const delGoodsCart = async ({state,commit},ids) =>{
+    let data = {
+       id:[...ids]
+    }
+     try {
+        let res = await tools.httpClient(API.DEL_CART_GOODS,data,true)
+        return true
+     } catch (error) {
+        return false
+     }
+ }
+ /**
+  * 修改购物车
+  * @param {*} param0 
+  */
+  const setGoodsCartCount = async ({state,commit},{id,count}) =>{
+    let data = {
+       id,
+       count
+    }
+     try {
+        let res = await tools.httpClient(API.SET_CART_GOODS_COUNT,data,true)
+        return true
+     } catch (error) {
+        return false
+     }
+ }
+ /**
+  * 购物车提交,返回确认订单信息
+  * @param {*} param0 
+  */
+  const confirmCartOrderInfo = async ({state,commit},params) =>{
+   try {
+      let res = await tools.httpClient(API.SUB_CART_ORDER_INFO,params,true)
+      return res
+   } catch (error) {
+      return false
+   }
+}
+ /**
+  * 购物车提交
+  * @param {*} param0 
+  */
+  const subCartOrder = async ({state,commit},params) =>{
+    
+     try {
+        let res = await tools.httpClient(API.SUB_CART_ORDER,params,true)
+        return res
+     } catch (error) {
+        return false
+     }
+ }
+
+ /**
+  * 购物车提交
+  * @param {*} param0 
+  */
+  const getAddressInfo = async ({state,commit},id) =>{
+   const tokenInfo = uni.getStorageSync('tokenInfo')
+   let data = {
+      id,
+      userId:tokenInfo.id,
+   }
+   try {
+      let res = await tools.httpClient(API.GET_ADDRESS_INFO,data,true)
+      return res
+   } catch (error) {
+      return false
+   }
+}
+/**
+  * 优惠券列表
+  * @param {*} param0 
+  */
+ const getCouponList = async ({state,commit},{amount = 0,pageNum}) =>{
+   const tokenInfo = uni.getStorageSync('tokenInfo')
+   let data = {
+      amount,
+       pageNum,
+       userId:tokenInfo.id,
+       pageSize:20
+   }
+    try {
+       let res = await tools.httpClient(API.GET_COUPON_LIST,data,true)
+       return res
+    } catch (error) {
+       return false
+    }
+ }
+ /**
+  * 购物车底部数据
+  * @param {*} param0 
+  */
+  const getCartBottom = async ({state,commit},params) =>{
+    try {
+       let res = await tools.httpClient(API.GET_CART_BOTTOM,params,true)
+       return res
+    } catch (error) {
+       return false
     }
  }
 export default{
@@ -284,5 +420,14 @@ export default{
     submitOrder,
     getGoodsInventory,
     getOrderList,
-    getOrderInfo
+    getOrderInfo,
+    addGoodsCart,
+    getGoodsCartList,
+    delGoodsCart,
+    setGoodsCartCount,
+    subCartOrder,
+    confirmCartOrderInfo,
+    getAddressInfo,
+    getCouponList,
+    getCartBottom
 }

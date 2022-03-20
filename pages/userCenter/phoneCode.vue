@@ -88,9 +88,9 @@ export default {
       // 发送验证码
       this.beforeCode = false
     },
-    async completeHandle(code) {
+    async completeHandle(data) {
       if (this.type === 1) {
-        let res = await this.login(code)
+        let res = await this.login(data.code)
         if (res) {
           uni.navigateBack({ delta: 1 })
         }

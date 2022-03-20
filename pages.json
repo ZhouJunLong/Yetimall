@@ -17,6 +17,7 @@
 		{
 			"path": "pages/cart/cart",
 			"style": {
+				"enablePullDownRefresh": true,
 				"navigationBarTitleText": "购物车",
 				"navigationBarTextStyle":"black",
 				"navigationBarBackgroundColor": "#ffffff"
@@ -145,6 +146,19 @@
 				"navigationBarTitleText": "账号管理",
 				"navigationBarTextStyle":"black"
 			}
+		},
+		{
+			"path": "pages/userCenter/coupon",
+			"style": {
+				"enablePullDownRefresh": true,
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "优惠券",
+				"navigationBarTextStyle":"black",
+				"usingComponents":{
+					"van-tab": "/wxcomponents/tab/index",
+					"van-tabs": "/wxcomponents/tabs/index"
+				}
+			}
 		}
 	],
 	"globalStyle": {
@@ -166,8 +180,8 @@
 			},
 			{
 				"pagePath": "pages/cart/cart",
-				"iconPath": "static/images/tabBar/tab-mall.png",
-				"selectedIconPath": "static/images/tabBar/tab-mall-selected.png",
+				"iconPath": "static/images/tabBar/tab-cart.png",
+				"selectedIconPath": "static/images/tabBar/tab-cart-selected.png",
 				"text": "购物车"
 			},
 			{

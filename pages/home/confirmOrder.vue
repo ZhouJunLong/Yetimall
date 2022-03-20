@@ -56,23 +56,28 @@
       </view>
       <view class="line line1"></view>
       <view class="discount">
-        <view class="discount-item">
+        <view class="discount-item"
+              v-if="currentCouponInfo.platformPreferential">
           <view class="item-left">
             <view class="title">折扣</view>
             <view class="des">限时折扣</view>
           </view>
           <view class="item-right">
-            <view class="price">-¥15.00</view>
+            <view class="price">-¥{{currentCouponInfo.platformPreferential}}</view>
             <image class="arrow"
                    src="../../static/images/home/arrow-right.png"></image>
           </view>
         </view>
-        <view class="discount-item">
+        <view class="discount-item"
+              @click="goToCoupon">
           <view class="item-left">
             <view class="title">优惠券</view>
           </view>
           <view class="item-right item-quan">
-            <view class="price">无可用优惠券</view>
+            <view class="price price-non"
+                  v-if="!currentCouponInfo.couponPrice">无可用优惠券</view>
+            <view class="price"
+                  v-else>-¥{{currentCouponInfo.couponPrice}}</view>
             <image class="arrow"
                    src="../../static/images/home/arrow-right.png"></image>
           </view>
@@ -128,19 +133,19 @@ export default {
       addressItem: null,
       orderGoodsInfoVoList: [],
       orderGoodsData: null,
+      isFromCart: false,
+      isFirst: true,
     }
   },
-  async onLoad() {
+  async onLoad(query) {
     let safeBottom = tools.getSafeAreaBottom() + 20
     this.safeBottom = `padding-bottom:${safeBottom}rpx`
 
-    let params = uni.getStorageSync('orderConfirmInfo')
-    if (!params) return
-    let orderData = await this.orderConfirm(params)
-    if (orderData) {
-      this.orderGoodsData = orderData
-      this.orderGoodsInfoVoList = orderData.orderGoodsInfoVoList || []
+    if (query.isFromCart) {
+      this.isFromCart = true
     }
+    await this.getConfirmData()
+    this.isFirst = false
   },
   async onShow() {
     if (this.currentSelectedAddress) {
@@ -151,16 +156,57 @@ export default {
         this.addressItem = (res.list && res.list[0]) || null
       }
     }
+    if (this.isFirst) return
+    if (this.currentCouponInfo) {
+      this.getConfirmData()
+    }
   },
   computed: {
-    ...mapState(['orderConfirmInfo', 'currentSelectedAddress']),
+    ...mapState([
+      'orderConfirmInfo',
+      'currentSelectedAddress',
+      'currentCouponInfo',
+    ]),
     hasAddress() {
       return this.addressItem
     },
   },
   methods: {
-    ...mapActions(['getAddressDefault', 'orderConfirm', 'submitOrder']),
+    ...mapActions([
+      'getAddressDefault',
+      'orderConfirm',
+      'submitOrder',
+      'confirmCartOrderInfo',
+      'subCartOrder',
+    ]),
     ...mapMutations(['setStateByKey']),
+    async getConfirmData() {
+      let params = uni.getStorageSync('orderConfirmInfo')
+      if (!params) return
+      // 有选择优惠券的话就 重新请求
+      if (this.currentCouponInfo) {
+        params.couponId = this.currentCouponInfo.id
+        params.couponPrice = this.currentCouponInfo.amount
+      }
+      let orderData = null
+      if (this.isFromCart) {
+        orderData = await this.confirmCartOrderInfo(params)
+      } else {
+        orderData = await this.orderConfirm(params)
+      }
+      if (orderData) {
+        this.orderGoodsData = orderData
+        this.orderGoodsInfoVoList = orderData.orderGoodsInfoVoList || []
+      }
+    },
+    // 跳转到优惠券列表
+    goToCoupon() {
+      uni.navigateTo({
+        url:
+          '/pages/userCenter/coupon?amount=' + this.orderGoodsData.orderPrice ||
+          0,
+      })
+    },
     selectAddress() {
       uni.navigateTo({
         url: '/pages/home/addressList?cb=1',
@@ -175,24 +221,40 @@ export default {
         })
         return
       }
-      let orderGoodsList = []
-      this.orderGoodsInfoVoList.forEach((item) => {
-        let obj = {
-          count: item.count || 1,
-          id: item.id,
+      let params = {}
+      let res = false
+      const addressId = this.addressItem.id
+      if (this.isFromCart) {
+        let info = uni.getStorageSync('orderConfirmInfo')
+        params = {
+          addressId,
+          cartIdList: info.cartIdList || [],
+          payTypeId: 1,
+          couponId: 0,
+          couponPrice: 0,
         }
-        item.propertyId && (obj.goodsPropertyId = item.propertyId)
-        orderGoodsList.push(obj)
-      })
-      let params = {
-        addressId: this.addressItem.id,
-        additionalOrderGoodsList: [],
-        orderGoodsList: orderGoodsList,
-        payTypeId: 1,
-        couponId: 0,
-        couponPrice: 0,
+        res = await this.subCartOrder(params)
+      } else {
+        let orderGoodsList = []
+        this.orderGoodsInfoVoList.forEach((item) => {
+          let obj = {
+            count: item.count || 1,
+            id: item.id,
+          }
+          item.propertyId && (obj.goodsPropertyId = item.propertyId)
+          orderGoodsList.push(obj)
+        })
+        params = {
+          addressId,
+          additionalOrderGoodsList: [],
+          orderGoodsList: orderGoodsList,
+          payTypeId: 1,
+          couponId: 0,
+          couponPrice: 0,
+        }
+        res = await this.submitOrder(params)
       }
-      let res = await this.submitOrder(params)
+
       if (res) {
         uni.redirectTo({
           url: '/pages/home/paySuccess?oid=' + res.id,
@@ -203,6 +265,8 @@ export default {
   destroyed() {
     this.setStateByKey({
       orderConfirmInfo: null,
+      currentSelectedAddress: null,
+      currentCouponInfo: null,
     })
   },
 }
@@ -418,9 +482,7 @@ export default {
             height: 15rpx;
             margin-left: 21rpx;
           }
-        }
-        .item-quan {
-          .price {
+          .price-non {
             color: #252525;
           }
         }

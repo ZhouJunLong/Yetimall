@@ -7,5 +7,6 @@ const state = {
     editAddressInfo:{},
     orderConfirmInfo:null,
     currentSelectedAddress:null,//当前选中的地址信息
+    currentCouponInfo:null
 }
 export default state

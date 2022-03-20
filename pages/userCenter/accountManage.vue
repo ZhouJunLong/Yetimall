@@ -1,17 +1,26 @@
 <template>
-  <view class="container"
-        @click="exChangePhone">
-    <view class="bind">
-      <view class="bind-left">
-        <view class="title">绑定手机</view>
-        <view class="phone">{{ phone }}</view>
-      </view>
-      <view class="right">
-        <view class="text">更换号码</view>
-        <image class="arrow"
-               src="../../static/images/home/arrow-right.png"></image>
+  <view>
+    <view class="container"
+          @click="exChangePhone">
+      <view class="bind">
+        <view class="bind-left">
+          <view class="title">绑定手机</view>
+          <view class="phone">{{ phone }}</view>
+        </view>
+        <view class="right">
+          <view class="text">更换号码</view>
+          <image class="arrow"
+                 src="../../static/images/home/arrow-right.png"></image>
+        </view>
       </view>
     </view>
+    <view class="item"
+          @click="gotoAddressList">
+      <view class="item-left">地址管理</view>
+      <image class="arrow"
+             src="../../static/images/home/arrow-right.png"></image>
+    </view>
+
   </view>
 </template>
 <script>
@@ -34,11 +43,18 @@ export default {
         url: '/pages/userCenter/phoneCode?type=2',
       })
     },
+    gotoAddressList() {
+      uni.navigateTo({
+        url: '/pages/home/addressList',
+      })
+    },
   },
 }
 </script>
 <style lang="scss" scoped>
 .container {
+  margin-top: 2rpx;
+
   .bind {
     display: flex;
     justify-content: space-between;
@@ -70,6 +86,24 @@ export default {
         margin-left: 19rpx;
       }
     }
+  }
+}
+.item {
+  display: flex;
+  justify-content: space-between;
+  padding: 38rpx 35rpx;
+  background-color: #fff;
+  margin-top: 2rpx;
+  .item-left {
+    font-size: 26rpx;
+    font-family: PingFang SC;
+    font-weight: 500;
+    color: #252525;
+  }
+  .arrow {
+    width: 15rpx;
+    height: 15rpx;
+    margin-left: 19rpx;
   }
 }
 </style>>

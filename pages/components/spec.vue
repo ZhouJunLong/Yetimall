@@ -42,7 +42,7 @@
                      src='../../static/temp/rank-shop.png'></image>
               <view class="item-info">
                 <view class="item-title">{{item.name}}</view>
-                <view class="item-num">一件 x{{ item.inventory }}</view>
+                <view class="item-num">一件 x1</view>
                 <view class="item-price">¥{{item.price}}</view>
               </view>
             </view>
@@ -55,7 +55,11 @@
       </view>
     </scroll-view>
     <view class="bottom">
+      <view class="btn "
+            v-if="isAddCart"
+            @click="gotoAddcart">加入购物车</view>
       <view class="btn"
+            v-else
             @click="gotoBuy">立即购买</view>
     </view>
   </view>
@@ -72,7 +76,11 @@ export default {
     },
     isStandard: {
       type: Boolean,
-      value: 0,
+      value: false,
+    },
+    isAddCart: {
+      type: Boolean,
+      value: false,
     },
   },
   data() {
@@ -129,6 +137,28 @@ export default {
         ],
       }
       this.$emit('gotoBuy', params)
+    },
+    async gotoAddcart() {
+      let addList = []
+      this.addVoList.forEach((item) => {
+        let obj = {
+          count: 1,
+          id: item.id,
+        }
+        addList.push(obj)
+      })
+      let orderGoodsList = [
+        {
+          count: 1,
+          goodsPropertyId: this.currentPropertyItem.id,
+          id: this.currentPropertyItem.goodsId,
+        },
+      ]
+      orderGoodsList = [...orderGoodsList, ...addList]
+      let params = {
+        orderGoodsList,
+      }
+      this.$emit('gotoAddCart', params)
     },
   },
   async created() {
@@ -329,6 +359,13 @@ export default {
     font-family: PingFang SC;
     font-weight: bold;
     color: #ffffff;
+  }
+  .cart-btn {
+    background: #8b8b8b;
+    opacity: 1;
+    border: 1px solid #8b8b8b;
+    color: #252525;
+    margin-right: 14rpx;
   }
 }
 </style>

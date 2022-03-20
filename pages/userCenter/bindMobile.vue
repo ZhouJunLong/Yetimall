@@ -7,10 +7,12 @@
            src='../../static/images/user/yeye-des.png'></image>
     <view class="mobile">
       <view class="mobile-input">
-        <view class="text">+86</view>
+        <input class="text"
+               type="number"
+               v-model="smsSendZone">
         <input class="input"
                v-model="smsSendMobiles"
-               type="text"
+               type="number"
                maxlength="11"
                placeholder="请输入手机号码">
       </view>
@@ -39,6 +41,7 @@ export default {
   methods: {
     ...mapActions(['sendCode', 'sendTest']),
     async getSendCode() {
+      console.log()
       if (!this.smsSendMobiles || this.smsSendMobiles.length !== 11) {
         uni.showToast({
           title: '请完善手机号',
@@ -47,8 +50,8 @@ export default {
         })
         return
       }
-      let res = await this.sendCode(this.smsSendMobiles)
-      if (res && res.smsCode) {
+      let res = await this.sendCode({ smsSendMobiles: this.smsSendMobiles })
+      if (res) {
         this.jumpCode()
       }
     },

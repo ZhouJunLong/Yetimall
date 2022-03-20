@@ -33,7 +33,7 @@
         </view>
         <view class="address_mobile">{{ addressInfo.phone }}</view>
       </view>
-      <view class="detail_address_des">{{ addressInfo.addressDetail }}</view>
+      <view class="detail_address_des">{{ addressInfo.address + addressInfo.addressDetail }}</view>
     </view>
     <view class="detail_goods">
       <view class="goods_top">
@@ -53,8 +53,7 @@
             <view class="good_item_title">{{ item.name }}</view>
             <view class="good_item_des">
               <view class="good_item_des_spec">
-                <text v-for="(item,index) in item.propertyList"
-                      :key="index">{{ item.name }} {{ item.value }}</text>
+                <text>{{item.property || '默认' }}</text>
               </view>
               <view class="good_item_num">数量：x{{ item.count }}</view>
             </view>
@@ -90,7 +89,7 @@
         <view class="info_item">
           <view class="info_item_title">创建时间：</view>
           <view class="info_item_right">
-            <view class="info_item_right_text">{{ infoDetail.add_time }}</view>
+            <view class="info_item_right_text">{{ infoDetail.addTime }}</view>
           </view>
         </view>
         <view class="info_item"
@@ -131,8 +130,8 @@
       <view class="cancel_pri detail_btn"
             v-if="orderStateObj.showPayBtn"
             @click="payOrder">立即付款</view>
-      <view class="cancel_pri detail_btn"
-            @click="payOrder">立即付款</view>
+      <!-- <view class="cancel_pri detail_btn"
+            @click="payOrder">立即付款</view> -->
       <!-- <view class="cancel_pri detail_btn" v-if="orderStateObj.showComment" @click="addComment">评价</view> -->
     </view>
   </view>
@@ -173,8 +172,9 @@ export default {
     },
     addressInfo() {
       if (!this.orderDetail) return {}
-      const { name, addressDetail, phone } = this.orderDetail
+      const { name, addressDetail, phone, address } = this.orderDetail
       return {
+        address,
         name,
         addressDetail,
         phone: tools.formatPhone(phone),
@@ -182,14 +182,6 @@ export default {
     },
     goodsList() {
       if (!this.orderDetail) return []
-      this.orderDetail.orderGoodsList &&
-        this.orderDetail.orderGoodsList.forEach((item) => {
-          item.property && (item.propertyList = JSON.parse(item.property))
-        })
-      console.log(
-        '--- this.orderDetail.orderGoodsList--',
-        this.orderDetail.orderGoodsList
-      )
       return this.orderDetail.orderGoodsList || []
     },
     feeDetail() {
@@ -202,10 +194,10 @@ export default {
     },
     infoDetail() {
       if (!this.orderDetail) return {}
-      const { orderNum, deliveryNum, add_time, payType } = this.orderDetail
+      const { orderNum, deliveryNum, addTime, payType } = this.orderDetail
       return {
         orderNum,
-        add_time,
+        addTime,
         payType:
           payType == 3 ? '余额支付' : payType === 2 ? '支付宝支付' : '微信支付',
         deliveryNum,
