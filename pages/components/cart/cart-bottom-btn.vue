@@ -4,10 +4,10 @@
           @click="selectAll">
       <image class="title-icon"
              v-if="!isSelectedAll"
-             src='../../../static/images/home/no-selected-icon.png'></image>
+             :src="local_url+'home/no-selected-icon.png'"></image>
       <image class="title-icon"
              v-else
-             src='../../../static/images/home/selected-icon.png'></image>
+             :src="local_url+'home/selected-icon.png'"></image>
       <view class="select-text">全选</view>
     </view>
     <view class="bottom-right">
@@ -28,6 +28,8 @@
   </view>
 </template>
 <script>
+import CONFIG from '@common/config.js'
+
 export default {
   name: 'cartBottomBtn',
   props: {
@@ -58,6 +60,11 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+  data() {
+    return {
+      local_url: CONFIG.LOACL_URL,
+    }
   },
   computed: {
     btnText() {

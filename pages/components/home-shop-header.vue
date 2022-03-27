@@ -30,6 +30,7 @@
   </view>
 </template>
 <script>
+import CONFIG from '@common/config.js'
 export default {
   name: 'home-shop-header',
   props: {},
@@ -37,9 +38,9 @@ export default {
     return {
       currentOrderByType: 0,
       orderByTypeT: 1,
-      defaultSortImg: '../../static/images/home/sort-icon-1.png',
-      upSortImg: '../../static/images/home/sort-icon-2.png',
-      dowmSortImg: '../../static/images/home/sort-icon-3.png',
+      defaultSortImg: CONFIG.LOACL_URL + 'home/sort-icon-1.png',
+      upSortImg: CONFIG.LOACL_URL + 'home/sort-icon-2.png',
+      dowmSortImg: CONFIG.LOACL_URL + 'home/sort-icon-3.png',
     }
   },
   computed: {

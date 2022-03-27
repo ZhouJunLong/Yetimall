@@ -76,21 +76,21 @@ export default {
   onLoad(query) {
     this.type = +query.type || 1
     if (this.type === 2) {
-      const tokenInfo = uni.getStorageSync('tokenInfo')
-      this.currentPhone = tokenInfo.telephone
-      this.inputPhone = tokenInfo.telephone
+      const userInfo = uni.getStorageSync('userInfo')
+      this.currentPhone = userInfo.phone
+      this.inputPhone = userInfo.phone
       this.beforeCode = true
     }
   },
   methods: {
-    ...mapActions(['login']),
+    ...mapActions(['bindPhoneLogin', 'sendCode']),
     getSendCode() {
       // 发送验证码
       this.beforeCode = false
     },
     async completeHandle(data) {
       if (this.type === 1) {
-        let res = await this.login(data.code)
+        let res = await this.bindPhoneLogin(data.code)
         if (res) {
           uni.navigateBack({ delta: 1 })
         }

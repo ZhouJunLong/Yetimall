@@ -3,7 +3,7 @@ const state = {
     sendCodeInfo:{},
     smsSendMobiles:'',//验证码的手机号
     smsSendZone:'86',//区号
-    tokenInfo:{},
+    userInfo:{},
     editAddressInfo:{},
     orderConfirmInfo:null,
     currentSelectedAddress:null,//当前选中的地址信息

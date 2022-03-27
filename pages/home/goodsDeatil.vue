@@ -23,21 +23,7 @@
           截止日期倒计时 {{goodDetail.endBuyTime}}
         </view>
       </view>
-      <!-- <view class="celebrity-info">
-        <view class="celebrity-left">
-          <image class="celebrity-left-icon"
-                 src="../../static/temp/shop-celebrity-icon.png"></image>
-          <view class="celebrity-left-info">
-            <view class="info-title">林允儿周边</view>
-            <view class="info-bottom">
-              7982人关注·12款商品
-            </view>
-          </view>
-        </view>
-        <image class="celebrity-right"
-               src=""></image>
-      </view> -->
-      <view class="recommend-info">
+      <!-- <view class="recommend-info">
         <view class="recommend-top">
           <view class="title">明星推荐</view>
           <view class="right">
@@ -59,7 +45,7 @@
             <view class="item-price">¥249</view>
           </view>
         </view>
-      </view>
+      </view> -->
       <view class="parameter-info"
             v-if="goodDetail.descParameter">
         <view v-html="desnodes">
@@ -67,7 +53,8 @@
       </view>
     </view>
     <view class="detail-img"
-          v-html="goodDetail.descDetail">
+          v-if="detailnodes">
+      <view v-html="detailnodes"></view>
     </view>
     <view class="recommend-goods">
       <view class="title-wrap">
@@ -87,12 +74,12 @@
       <view class="left-wrap">
         <view class="customer">
           <image class="icon"
-                 src="../../static/images/home/customer-icon.png"></image>
+                 :src="local_url+'home/customer-icon.png'"></image>
           <text class="text">客服</text>
         </view>
         <view class="cart">
           <image class="icon"
-                 src="../../static/images/home/shoucang-2@2x.png"></image>
+                 :src="local_url+'home/shoucang-2@2x.png'"></image>
           <text class="text">收藏</text>
         </view>
       </view>
@@ -121,6 +108,8 @@ import spec from '../components/spec.vue'
 
 import tools from '../../common/tools.js'
 import { mapState, mapActions } from 'vuex'
+import { interceptTap } from '@common/utils.js'
+import CONFIG from '@common/config.js'
 
 export default {
   data() {
@@ -130,6 +119,7 @@ export default {
       goodDetail: null,
       showSpec: false,
       isAddCart: false,
+      local_url: CONFIG.LOACL_URL,
     }
   },
   components: {
@@ -145,7 +135,17 @@ export default {
       if (this.goodDetail && this.goodDetail.descParameter) {
         let nodes = this.goodDetail.descParameter.replace(
           /\<img/gi,
-          '<img style="max-width:100%;height:auto" '
+          '<img style="width:100%;height:auto"'
+        )
+        return nodes
+      }
+      return ''
+    },
+    detailnodes() {
+      if (this.goodDetail && this.goodDetail.descDetail) {
+        let nodes = this.goodDetail.descDetail.replace(
+          /\<img/gi,
+          '<img style="width:100%;height:auto" '
         )
         return nodes
       }
@@ -162,6 +162,7 @@ export default {
     ...mapActions(['getGoodsDetail', 'getGoodsInventory', 'addGoodsCart']),
     async gotoBuyHandle(params) {
       this.closeHandle()
+      if (!interceptTap()) return
       if (!params) return
       let res = await this.getGoodsInventory(params)
       if (res) {
@@ -173,6 +174,7 @@ export default {
     },
     async gotoAddCartHandle(params) {
       this.closeHandle()
+      if (!interceptTap()) return
       let res = await this.addGoodsCart(params)
       if (res) {
         uni.showToast({
@@ -454,10 +456,9 @@ export default {
     // }
   }
   .detail-img {
-    width: 100%;
-    .pic {
+    width: 100vw;
+    img {
       width: 100%;
-      //   height: 100%;
     }
   }
   .recommend-goods {

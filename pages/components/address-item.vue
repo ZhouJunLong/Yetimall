@@ -21,15 +21,15 @@
           <view class="line"></view>
           <image class="edit"
                  @click="editAddress()"
-                 src='../../static/images/home/edit-icon.png'></image>
+                 :src="local_url+'home/edit-icon.png'"></image>
         </view>
       </view>
       <view class="item-bottom">
-        <view class="item-bottom-left">
+        <view class="item-bottom-left"
+              @click="setDefaultAddress">
           <!-- <image class="select selected"></image> -->
           <image class="select"
-                 @click="setDefaultAddress"
-                 :src="itemData.isDefault ? '../../static/images/home/selected-icon.png' : '../../static/images/home/no-selected-icon.png'"></image>
+                 :src="itemData.isDefault ? local_url+'home/selected-icon.png' : local_url+'home/no-selected-icon.png'"></image>
           <view class="text">默认地址</view>
         </view>
         <view class="item-bottom-right"
@@ -40,7 +40,7 @@
 </template>
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
-
+import CONFIG from '@common/config.js'
 export default {
   name: 'addressItem',
   props: {
@@ -48,6 +48,11 @@ export default {
       type: Object,
       value: null,
     },
+  },
+  data() {
+    return {
+      local_url: CONFIG.LOACL_URL,
+    }
   },
   computed: {},
   methods: {
@@ -59,11 +64,13 @@ export default {
       })
     },
     async setDefaultAddress() {
+      uni.showLoading()
       let params = {
         id: this.itemData.id,
         isDefault: this.itemData.isDefault === 1 ? 0 : 1,
       }
       let res = await this.setAddressDefault(params)
+      uni.hideLoading()
       if (res) {
         this.$emit('setDefault')
       }

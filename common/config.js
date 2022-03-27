@@ -1,5 +1,6 @@
 // const BASE_URL = "https://yetimall.fun/public/"
 const BASE_URL = "http://47.243.135.190/yeye-user"
+const LOACL_URL = "https://bigpop.oss-cn-beijing.aliyuncs.com/wxapp/"
 const stateConfig = [
     {
         state:0,
@@ -31,7 +32,7 @@ const stateConfig = [
         state:3,
         stateStatus:'已收货',
         stateTitle:'交易成功',
-        stateDes:'感谢您对YEYE的信任，期待您再次选择',
+        stateDes:'感谢您对bigpop的信任，期待您再次选择',
         showPayMethod:true,
         showDelivery:true,
         showDeleteOrderBtn:true
@@ -47,7 +48,7 @@ const stateConfig = [
         state:5,
         stateStatus:'交易成功',
         stateTitle:'订单已结束',
-        stateDes:'感谢您对YEYE的信任，期待您再次选择',
+        stateDes:'感谢您对bigpop的信任，期待您再次选择',
         showPayMethod:true,
         showDelivery:true,
         showDeleteOrderBtn:true,
@@ -71,7 +72,7 @@ const stateConfig = [
         state:8,
         stateStatus:'用户取消订单 ',
         stateTitle:'用户取消订单 ',
-        stateDes:'感谢您对YEYE的信任，期待您再次选择',
+        stateDes:'感谢您对bigpop的信任，期待您再次选择',
         showPayMethod:true,
         showDelivery:true,
         showDeleteOrderBtn:true
@@ -79,5 +80,6 @@ const stateConfig = [
 ]
 export default {
     BASE_URL,
-    stateConfig
+    stateConfig,
+    LOACL_URL
 }

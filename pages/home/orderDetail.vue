@@ -15,7 +15,7 @@
         <view class="detail_header_address_top">
           <view class="address_top_left">
             <image class="address_icon"
-                   src="../../static/images/home/kuaidi.png"></image>
+                   :src="local_url+'home/kuaidi.png'"></image>
             <text class="address_name">{{ trajectory.title }}</text>
           </view>
           <view class="address_kuaidi_name">{{ trajectory.express_name }}</view>
@@ -28,7 +28,7 @@
       <view class="detail_address_top">
         <view class="address_top_left">
           <image class="address_icon"
-                 src="../../static/images/home/location.png"></image>
+                 :src="local_url+'home/location.png'"></image>
           <text class="address_name">收货人：{{ addressInfo.name }}</text>
         </view>
         <view class="address_mobile">{{ addressInfo.phone }}</view>
@@ -37,7 +37,7 @@
     </view>
     <view class="detail_goods">
       <view class="goods_top">
-        <view class="goods_top_title">YEYE平台直邮</view>
+        <view class="goods_top_title">bigpop平台直邮</view>
         <view class="goods_top_time"
               v-if="delivery_time">{{ delivery_time }}</view>
       </view>
@@ -137,8 +137,8 @@
   </view>
 </template>
 <script>
-import tools from '../../common/tools.js'
-import CONFIG from '../../common/config.js'
+import tools from '@common/tools.js'
+import CONFIG from '@common/config.js'
 import { mapState, mapActions, mapMutations } from 'vuex'
 let base_url = CONFIG.BASE_URL
 const stateConfig = CONFIG.stateConfig
@@ -150,6 +150,7 @@ export default {
       oid: '',
       orderDetail: null,
       showDetail: false,
+      local_url: CONFIG.LOACL_URL,
     }
   },
   onLoad(options) {

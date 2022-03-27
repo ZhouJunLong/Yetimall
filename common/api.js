@@ -5,7 +5,7 @@ const API = {
     GET_GOODS_PROPERTY: '/shop/home/getgoodsinfo/property',//规格
     ORDER_CONFIRM :'/shop/order/confirm/get/info', //提交订单
     SEND_CODE: '/sms/user/send',//发送验证码
-    LOGIN: '/jwt/loginSms',//登录
+    LOGIN: '/jwt/bind/user/phone',//登录
     ADDRESS_ADD: '/user/address/add',//新增地址
     ADDRESS_EDIT: '/user/address/set',//修改地址
     UP_LOAD_IMG: '/upload/images/up', //上传图片
@@ -27,6 +27,8 @@ const API = {
     GET_ADDRESS_INFO:'/user/address/get/info',//地址详情
     GET_COUPON_LIST:'/coupon/user/getlist',//优惠券列表
     GET_CART_BOTTOM :'/shop/cart/choice/goods/getprice',//购物车底部数据
+
+    LOGIN_WX :'/jwt/login/wx',//微信登录
 
 
 

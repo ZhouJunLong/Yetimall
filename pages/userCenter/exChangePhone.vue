@@ -8,24 +8,26 @@
       <view class="right">
         <view class="text">更换号码</view>
         <image class="arrow"
-               src="../../static/images/home/arrow-right.png"></image>
+               :src="local_url+'home/arrow-right.png'"></image>
       </view>
     </view>
   </view>
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
+import CONFIG from '@common/config.js'
 
 export default {
   data() {
     return {
       phone: '',
+      local_url: CONFIG.LOACL_URL,
     }
   },
   onLoad() {
     //   这里其实应该从userInfo中取
-    const tokenInfo = uni.getStorageSync('tokenInfo')
-    this.phone = tokenInfo.telephone
+    const userInfo = uni.getStorageSync('userInfo')
+    this.phone = userInfo.phone
   },
   methods: {},
 }

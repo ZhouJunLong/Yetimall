@@ -4,14 +4,21 @@
       <image class="shop-logo"
              src="../../static/images/home/home-shop-logo.png"></image>
       <image class="shop-title"
-             src="../../static/images/home/home-shop-title.png"></image>
+             :src="local_url+'home/home-shop-title.png'"></image>
     </view>
     <view class="shop-top-right">价格优惠·正品保障·明星同款</view>
   </view>
 </template>
 <script>
+import CONFIG from '@common/config.js'
+
 export default {
   name: 'home-shop-safe',
+  data() {
+    return {
+      local_url: CONFIG.LOACL_URL,
+    }
+  },
 }
 </script>
 <style lang="scss" scoped>

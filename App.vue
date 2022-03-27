@@ -1,13 +1,18 @@
 <script>
+import { mapMutations } from 'vuex'
 export default {
   onLaunch: function () {
     console.log('App Launch')
+    this.setUserInfoToStore()
   },
   onShow: function () {
     console.log('App Show')
   },
   onHide: function () {
     console.log('App Hide')
+  },
+  methods: {
+    ...mapMutations(['setUserInfoToStore']),
   },
 }
 </script>

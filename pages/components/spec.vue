@@ -14,7 +14,7 @@
       </view>
       <image class="close-icon"
              @click="close"
-             src='../../static/images/home/close.png'></image>
+             :src="local_url+'home/close.png'"></image>
     </view>
     <scroll-view class="scroll-wrap"
                  :scroll-y="true">
@@ -28,6 +28,16 @@
                  :src="item.imgUrl || '../../static/temp/rank-shop.png'"></image>
           <view class="item-title">{{item.propertyText}}</view>
           <view class="price">¥{{item.price}}</view>
+        </view>
+      </view>
+      <view class="spec-num">
+        <view class="title">购买数量</view>
+        <view class="edit-num">
+          <view class="reduce border"
+                @click="changeNum(-1)">-</view>
+          <view class="nums">{{ currentCount }}</view>
+          <view class="add border"
+                @click="changeNum(1)">+</view>
         </view>
       </view>
       <view class="add-wrap">
@@ -48,7 +58,7 @@
             </view>
             <view class="item-right">
               <image class="no-selected"
-                     :src="item.selected ? '../../static/images/home/selected-icon.png' : '../../static/images/home/no-selected-icon.png'"></image>
+                     :src="item.selected ? local_url+'home/selected-icon.png' : local_url+'home/no-selected-icon.png'"></image>
             </view>
           </view>
         </view>
@@ -66,6 +76,7 @@
 </template>
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
+import CONFIG from '@common/config.js'
 
 export default {
   name: 'spec',
@@ -91,6 +102,8 @@ export default {
       currentPropertyId: 0,
       currentPropertyItem: null,
       addVoList: [],
+      currentCount: 1,
+      local_url: CONFIG.LOACL_URL,
     }
   },
   computed: {
@@ -103,6 +116,9 @@ export default {
       this.$emit('close')
     },
     selectSpecItem(item) {
+      if (this.currentPropertyId !== item.id) {
+        this.currentCount = 1
+      }
       this.currentPropertyId = item.id
       this.currentPropertyItem = item
     },
@@ -130,7 +146,7 @@ export default {
         additionalOrderGoodsList: addList || [],
         orderGoodsList: [
           {
-            count: 1,
+            count: this.currentCount || 1,
             goodsPropertyId: this.currentPropertyItem.id,
             id: this.currentPropertyItem.goodsId,
           },
@@ -149,7 +165,7 @@ export default {
       })
       let orderGoodsList = [
         {
-          count: 1,
+          count: this.currentCount || 1,
           goodsPropertyId: this.currentPropertyItem.id,
           id: this.currentPropertyItem.goodsId,
         },
@@ -159,6 +175,18 @@ export default {
         orderGoodsList,
       }
       this.$emit('gotoAddCart', params)
+    },
+    // 改变数量
+    changeNum(num) {
+      if (this.currentCount + num < 1) {
+        uni.showToast({
+          title: '数量不能小于1',
+          icon: 'none',
+          duration: 2000,
+        })
+        return
+      }
+      this.currentCount += num
     },
   },
   async created() {
@@ -251,13 +279,13 @@ export default {
       border: 4rpx solid #252525;
     }
     .spec-item {
-      &:nth-child(3n) {
+      &:nth-child(4n) {
         margin-right: 0;
       }
       width: 168rpx;
       box-sizing: border-box;
       margin-top: 30rpx;
-      margin-right: 100rpx;
+      margin-right: 11rpx;
       background-color: #fff;
       display: flex;
       flex-direction: column;
@@ -282,6 +310,42 @@ export default {
         font-weight: 500;
         color: #252525;
       }
+    }
+  }
+  .spec-num {
+    font-family: PingFang SC;
+    color: #252525;
+    margin-top: 44rpx;
+    padding-left: 20rpx;
+    padding-right: 20rpx;
+    margin-bottom: 45rpx;
+    .title {
+      font-size: 24rpx;
+      font-weight: bold;
+    }
+    .edit-num {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .border {
+      width: 71rpx;
+      height: 43rpx;
+      line-height: 43rpx;
+      background: #ffffff;
+      border: 1px solid #8b8b8b;
+      border-radius: 21rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #252525;
+    }
+    .disable {
+      color: #8b8b8b;
+    }
+    .nums {
+      padding-left: 30rpx;
+      padding-right: 30rpx;
     }
   }
   .add-wrap {

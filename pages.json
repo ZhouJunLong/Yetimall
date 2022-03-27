@@ -8,7 +8,6 @@
 				"navigationBarTitleText": "商城",
 				"navigationBarTextStyle":"black",
 				"usingComponents":{
-					"van-button": "/wxcomponents/button/index",
 					"van-tab": "/wxcomponents/tab/index",
 					"van-tabs": "/wxcomponents/tabs/index"
 				}
@@ -28,16 +27,6 @@
 			"style": {
 				"navigationStyle":"custom",
 				"backgroundColor": "#ffffff",
-				"app-plus":{
-					"titleNView":false
-				}
-			}
-		},
-		{
-			"path": "pages/home/celebrity",
-			"style": {
-				"navigationBarTitleText": "明星商城",
-				"navigationStyle":"custom",
 				"app-plus":{
 					"titleNView":false
 				}
@@ -158,6 +147,24 @@
 					"van-tab": "/wxcomponents/tab/index",
 					"van-tabs": "/wxcomponents/tabs/index"
 				}
+			}
+		},
+		{
+			"path": "pages/userCenter/wxlogin",
+			"style": {
+				"enablePullDownRefresh": true,
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "登录",
+				"navigationBarTextStyle":"black"
+			}
+		},
+		{
+			"path": "pages/userCenter/footprint",
+			"style": {
+				"enablePullDownRefresh": true,
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTitleText": "我的足迹",
+				"navigationBarTextStyle":"black"
 			}
 		}
 	],

@@ -1,25 +1,32 @@
 import CONFIG from './config.js'
 const base_url = CONFIG.BASE_URL
+let isShowLoginToast = false
 const tools = {	
 	/**
 	 * request请求
 	 */
 	httpClient(url,data,isShowToast = false) {
-	 const tokenInfo = uni.getStorageSync('tokenInfo');
+	 const userInfo = uni.getStorageSync('userInfo');
 		return new Promise((resolve,reject)=>{
 			uni.request({
 				url: base_url + url,
 				data: data,
 				header: {
 					"Content-Type": "application/json",
-					'Authorization':"Bearer " + tokenInfo.accessToken || ''
+					'Authorization':"Bearer " + userInfo.accessToken || ''
 				},
 				method: "POST",
 				dataType: 'json',
 				success: function ( res ) {
 					if(res.statusCode === 200 && res.data.statusCode === 200){
+					//弹框提示
 						resolve(res.data.data || '成功')
 					}else{
+						if(isShowToast && res.data.statusCode == 40101){
+							tools.showLoginToast()
+							reject(res)
+							return
+						}
 						if(isShowToast && res.data.message){
 							uni.showToast({
 								title: res.data.message,
@@ -38,7 +45,7 @@ const tools = {
 		
 	},
 	uploadImage(url,isShowToast = false){
-		const tokenInfo = uni.getStorageSync('tokenInfo');
+		const userInfo = uni.getStorageSync('userInfo');
 		return new Promise((resolve,reject)=>{
 			wx.chooseImage({
 				success (res) {
@@ -48,7 +55,7 @@ const tools = {
 					filePath: tempFilePaths[0],
 					header: {
 						"Content-Type": "application/json",
-						'Authorization':"Bearer " + tokenInfo.accessToken || ''
+						'Authorization':"Bearer " + userInfo.accessToken || ''
 					},
 					name: 'file',
 					formData: {
@@ -72,6 +79,58 @@ const tools = {
 				  })
 				}
 			  })
+		})
+	},
+	showLoginToast(){
+		if(isShowLoginToast) return
+		isShowLoginToast = true
+		let userInfo = uni.getStorageSync('userInfo')
+		const title = userInfo && userInfo.id ? '登录过期，请重新登录！' : '微信授权成功即可享受该权益'
+		//弹框提示
+		uni.showModal({
+			title: '提示',
+			content: title,
+			showCancel: true,
+			cancelText: '取消',
+			cancelColor: '#666666',
+			confirmText: '去登录',
+			confirmColor: '#57D0D9',
+			success: (res) => {
+				if (res.confirm) {
+					//用户点击去授权
+					uni.navigateTo({
+						url: '/pages/userCenter/wxlogin'
+					})
+					isShowLoginToast = false
+				} else if (res.cancel) {
+					isShowLoginToast = false
+				}
+			}
+		})
+	},
+	showPhoneToast(){
+		if(isShowLoginToast) return
+		isShowLoginToast = true
+		//弹框提示
+		uni.showModal({
+			title: '提示',
+			content: '请绑定手机号',
+			showCancel: true,
+			cancelText: '取消',
+			cancelColor: '#666666',
+			confirmText: '去绑定',
+			confirmColor: '#57D0D9',
+			success: (res) => {
+				if (res.confirm) {
+					//用户绑定手机号
+					uni.navigateTo({
+						url: '/pages/userCenter/bindMobile'
+					})
+					isShowLoginToast = false
+				} else if (res.cancel) {
+					isShowLoginToast = false
+				}
+			}
 		})
 	},
 	/**

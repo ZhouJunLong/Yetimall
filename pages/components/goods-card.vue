@@ -14,6 +14,7 @@
   </view>
 </template>
 <script>
+import { interceptTap } from '@common/utils.js'
 export default {
   name: 'goosCard',
   props: {
@@ -24,6 +25,7 @@ export default {
   },
   methods: {
     gotoDetail() {
+      if (!interceptTap()) return
       uni.navigateTo({
         url: '/pages/home/goodsDeatil?id=' + this.goodItem.id,
       })

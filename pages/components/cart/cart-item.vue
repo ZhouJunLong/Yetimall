@@ -5,12 +5,12 @@
         <view @click="selectItem">
           <image class="title-icon"
                  v-if="!isSelected"
-                 src='../../../static/images/home/no-selected-icon.png'></image>
+                 :src="local_url+'home/no-selected-icon.png'"></image>
           <image class="title-icon"
                  v-else
-                 src='../../../static/images/home/selected-icon.png'></image>
+                 :src="local_url+'home/selected-icon.png'"></image>
         </view>
-        <view class="title-text">YEYE平台直邮</view>
+        <view class="title-text">bigpop平台直邮</view>
       </view>
       <view class="title-right"
             @click="deleteItem">删除</view>
@@ -45,6 +45,8 @@
   </view>
 </template>
 <script>
+import CONFIG from '@common/config.js'
+
 export default {
   name: 'cartItem',
   props: {
@@ -61,6 +63,7 @@ export default {
   data() {
     return {
       isSelected: false,
+      local_url: CONFIG.LOACL_URL,
     }
   },
   computed: {},
@@ -210,7 +213,7 @@ export default {
             .edit-text {
               font-size: 28rpx;
               text-align: center;
-
+              line-height: 42rpx;
               min-width: 40rpx;
             }
           }

@@ -80,6 +80,7 @@ const getHomeInfo = async ({},categoryId = 0) =>{
        if(res){
         commit('setStateByKey',{
             smsSendMobiles,
+            smsSendZone:smsSendZone,
             sendCodeInfo:res
         })
        }
@@ -95,17 +96,24 @@ const getHomeInfo = async ({},categoryId = 0) =>{
  * 登录
  * @param {*} param0 
  */
- const login = async ({state,commit},smsCode) =>{
-     const username = state.smsSendMobiles
+ const bindPhoneLogin = async ({state,commit},smsCode) =>{
+     const phone = state.smsSendMobiles
      const smsSendZone = state.smsSendZone
      const uuid = state.sendCodeInfo.uuid
+     let data = {
+      phone,
+      sendZone:smsSendZone,
+      smsCode,
+      uuid
+     }
     try {
-       let res = await tools.httpClient(API.LOGIN,{username,uuid,smsCode,smsSendZone},true)
+       let res = await tools.httpClient(API.LOGIN,data,true)
        if(res && res.accessToken){
         commit('setStateByKey',{
-            tokenInfo:res
+            userInfo:res
         })
-        uni.setStorageSync('tokenInfo',res);
+        commit('setUserInfo',res)
+      //   uni.setStorageSync('userInfo',res);
         commit('setStateByKey',{
             sendCodeInfo:null
         })
@@ -144,10 +152,10 @@ const getHomeInfo = async ({},categoryId = 0) =>{
   * @param {*} param0 
   */
   const addressList = async ({state,commit},pageNum) =>{
-    const tokenInfo = uni.getStorageSync('tokenInfo')
+    const userInfo = uni.getStorageSync('userInfo')
     let data = {
         pageNum,
-        userId:tokenInfo.id,
+        userId:userInfo.id,
         pageSize:20
     }
      try {
@@ -174,8 +182,8 @@ const getHomeInfo = async ({},categoryId = 0) =>{
   * @param {*} param0 
   */
     const getAddressDefault = async ({state,commit},id) =>{
-        const tokenInfo = uni.getStorageSync('tokenInfo')
-        const userId = tokenInfo.id
+        const userInfo = uni.getStorageSync('userInfo')
+        const userId = userInfo.id
          try {
             let res = await tools.httpClient(API.ADDRESS_DEFAULT,{pageNum:1,pageSize:1,userId},true)
             return res
@@ -212,6 +220,7 @@ const getHomeInfo = async ({},categoryId = 0) =>{
   * @param {*} param0 
   */
   const submitOrder = async ({state,commit},params) =>{
+   params.orderFrom = 2 // 2-小程序   3-H5
     try {
        let res = await tools.httpClient(API.SUBMIT_ORDER,params,true)
        return res
@@ -236,10 +245,10 @@ const getHomeInfo = async ({},categoryId = 0) =>{
   * @param {*} param0 
   */
   const getOrderList = async ({state,commit},{orderState,pageNum}) =>{
-    const tokenInfo = uni.getStorageSync('tokenInfo')
+    const userInfo = uni.getStorageSync('userInfo')
     let data = {
         pageNum,
-        userId:tokenInfo.id,
+        userId:userInfo.id,
         pageSize:20,
         orderState
     }
@@ -255,9 +264,9 @@ const getHomeInfo = async ({},categoryId = 0) =>{
   * @param {*} param0 
   */
   const getOrderInfo = async ({state,commit},orderId) =>{
-    const tokenInfo = uni.getStorageSync('tokenInfo')
+    const userInfo = uni.getStorageSync('userInfo')
     let data = {
-        userId:tokenInfo.id,
+        userId:userInfo.id,
         orderId
     }
     try {
@@ -284,10 +293,10 @@ const getHomeInfo = async ({},categoryId = 0) =>{
   * @param {*} param0 
   */
   const getGoodsCartList = async ({state,commit},pageNum) =>{
-    const tokenInfo = uni.getStorageSync('tokenInfo')
+    const userInfo = uni.getStorageSync('userInfo')
     let data = {
         pageNum,
-        userId:tokenInfo.id,
+        userId:userInfo.id,
         pageSize:20
     }
      try {
@@ -359,10 +368,10 @@ const getHomeInfo = async ({},categoryId = 0) =>{
   * @param {*} param0 
   */
   const getAddressInfo = async ({state,commit},id) =>{
-   const tokenInfo = uni.getStorageSync('tokenInfo')
+   const userInfo = uni.getStorageSync('userInfo')
    let data = {
       id,
-      userId:tokenInfo.id,
+      userId:userInfo.id,
    }
    try {
       let res = await tools.httpClient(API.GET_ADDRESS_INFO,data,true)
@@ -376,11 +385,11 @@ const getHomeInfo = async ({},categoryId = 0) =>{
   * @param {*} param0 
   */
  const getCouponList = async ({state,commit},{amount = 0,pageNum}) =>{
-   const tokenInfo = uni.getStorageSync('tokenInfo')
+   const userInfo = uni.getStorageSync('userInfo')
    let data = {
       amount,
        pageNum,
-       userId:tokenInfo.id,
+       userId: 223,//userInfo.id,
        pageSize:20
    }
     try {
@@ -409,7 +418,7 @@ export default{
     getGoodsProperty,
     orderConfirm,
     sendCode,
-    login,
+    bindPhoneLogin,
     addressAdd,
     upload,
     addressList,

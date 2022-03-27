@@ -30,7 +30,7 @@
           <pickerAddress @change="addressChange">{{ !addressTxt ? '请选择省市区' : addressTxt}}</pickerAddress>
         </view>
         <image class="arrow"
-               src="../../static/images/home/arrow-right.png"></image>
+               :src="local_url+'home/arrow-right.png'"></image>
       </view>
       <view class="wrap-item">
         <view class="item-title">详细地址</view>
@@ -67,14 +67,14 @@
         <view class="card-con">
           <image class="card-img"
                  @click="uploadCard(1)"
-                 :src="identityCardImgFront ? identityCardImgFront :'../../static/images/home/idcard-qian.png'"></image>
+                 :src="identityCardImgFront ? identityCardImgFront : local_url+'home/idcard-qian.png'"></image>
           <image class="card-img"
                  @click="uploadCard(2)"
-                 :src=" identityCardImgBack ? identityCardImgBack :'../../static/images/home/idcard-hou.png'"></image>
+                 :src=" identityCardImgBack ? identityCardImgBack : local_url+ 'home/idcard-hou.png'"></image>
         </view>
         <view class="card-tips">
           <image class="card-icon"
-                 src="../../static/images/home/tips.png"></image>
+                 :src="local_url+'home/tips.png'"></image>
           <view class="tisp">身份证照片仅用于清关使用，不做其他用途</view>
         </view>
       </view>
@@ -93,8 +93,9 @@ function toast(title) {
     duration: 1500,
   })
 }
-import pickerAddress from '../components/wangding-pickerAddress/wangding-pickerAddress.vue'
+import pickerAddress from '@components/wangding-pickerAddress/wangding-pickerAddress.vue'
 import { mapState, mapActions, mapMutations } from 'vuex'
+import CONFIG from '@common/config.js'
 
 export default {
   components: {
@@ -115,6 +116,7 @@ export default {
       zoneCode: '86', //区号 86
       id: '',
       isEdit: false,
+      local_url: CONFIG.LOACL_URL,
     }
   },
   computed: {
@@ -164,21 +166,27 @@ export default {
     async saveAddress() {
       if (!this.addressTxt) {
         toast('请选择地址')
+        return
       }
       if (!this.addressDetail) {
         toast('请输入详细地址')
+        return
       }
       if (!this.identityCard) {
         toast('请输入身份证号码')
+        return
       }
       if (!this.identityCardImgFront) {
         toast('请上传身份证正面')
+        return
       }
       if (!this.identityCardImgBack) {
         toast('请上传身份证反面')
+        return
       }
       if (!this.nameReal) {
         toast('请输入真实姓名')
+        return
       }
       //弹框提示
       uni.showModal({

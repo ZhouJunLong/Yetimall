@@ -15,7 +15,18 @@ const setStateByKey =(state,data) =>{
         }
     })
 }
-
+const setUserInfo = (state,data) => {
+    state.userInfo = data
+    uni.setStorageSync('userInfo', data)
+}
+const setUserInfoToStore = (state ) => {
+   let userInfo = uni.getStorageSync('userInfo')
+   if(userInfo){
+    state.userInfo = userInfo
+   }
+}
 export  default{
-    setStateByKey
+    setStateByKey,
+    setUserInfo,
+    setUserInfoToStore
 } 

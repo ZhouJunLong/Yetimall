@@ -2,7 +2,7 @@
   <view class="container">
     <view class="result">
       <image class="pic"
-             src='../../static/images/home/pay-success.png'></image>
+             :src="local_url+'home/pay-success.png'"></image>
       <view class="result-text">支付成功</view>
       <view class="btn-groups">
         <view class="btn border-btn"
@@ -22,7 +22,14 @@
 </template>
 <script>
 import goodCard from '../components/goods-card.vue'
+import CONFIG from '@common/config.js'
+
 export default {
+  data() {
+    return {
+      local_url: CONFIG.LOACL_URL,
+    }
+  },
   components: {
     'good-card': goodCard,
   },

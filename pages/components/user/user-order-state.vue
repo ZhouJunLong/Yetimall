@@ -20,6 +20,7 @@
   </view>
 </template>
 <script>
+import { interceptTap } from '@common/utils.js'
 export default {
   name: 'userOrderState',
   data() {
@@ -53,17 +54,25 @@ export default {
           iconWidth: '42rpx',
           jumpUrl: '/pages/userCenter/collect',
         },
-        { state: 5, title: '足迹', icon: 'state-5', iconWidth: '48rpx' },
+        {
+          state: 5,
+          title: '足迹',
+          icon: 'state-5',
+          iconWidth: '48rpx',
+          jumpUrl: '/pages/userCenter/footprint',
+        },
       ],
     }
   },
   methods: {
-    jumpPage(item) {
+    async jumpPage(item) {
+      if (!interceptTap()) return
       uni.navigateTo({
         url: item.jumpUrl,
       })
     },
     gotoOrderList() {
+      if (!interceptTap()) return
       uni.navigateTo({
         url: '/pages/userCenter/orderList?state=100',
       })

@@ -23,7 +23,8 @@
         <text class="text-de">重新获取验证码</text>
         <text class="text-btn">{{ timer }}s</text>
       </view>
-      <view v-else>
+      <view v-else
+            @click="getSendCode">
         <text class="text-btn">获取验证码</text>
       </view>
     </view>
@@ -49,18 +50,21 @@ export default {
     }
   },
   computed: {
-    ...mapState(['sendCodeInfo']),
+    ...mapState(['sendCodeInfo', 'smsSendMobiles', 'smsSendZone']),
   },
   watch: {
-    show(newVal) {
-      this.code = ''
-      if (newVal) {
-        this.canRecode = false
-        this.timer = this.sendCodeInfo.interval || 120
-        this.delayTime()
-      } else {
-        this.clearTime()
-      }
+    show: {
+      handler(newVal) {
+        this.code = ''
+        if (newVal) {
+          this.canRecode = false
+          this.timer = this.sendCodeInfo.interval || 120
+          this.delayTime()
+        } else {
+          this.clearTime()
+        }
+      },
+      immediate: true,
     },
   },
   // onShow() {
@@ -69,10 +73,17 @@ export default {
   //   this.timer = this.sendCodeInfo.interval || 120
   //   this.delayTime()
   // },
-  // destroyed() {
-  //   this.clearTime()
-  // },
+  detached() {
+    this.clearTime()
+  },
   methods: {
+    ...mapActions(['sendCode']),
+    async getSendCode() {
+      let res = await this.sendCode({ smsSendMobiles: this.smsSendMobiles })
+      if (res) {
+        this.delayTime()
+      }
+    },
     clearTime() {
       if (!this.timer) return
       clearInterval(this.timerId)
@@ -84,6 +95,7 @@ export default {
         if (this.timer <= 0) {
           this.timer = 120
           this.canRecode = true
+          this.clearTime()
         }
       }, 1000)
     },

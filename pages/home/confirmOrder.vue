@@ -6,7 +6,7 @@
             @click="selectAddress">
         <view class="title">请填写收货地址</view>
         <image class="arrow"
-               src="../../static/images/home/arrow-right.png"></image>
+               :src="local_url+'home/arrow-right.png'"></image>
       </view>
       <view class="address-has"
             @click="selectAddress"
@@ -19,7 +19,7 @@
         <view class="address-center">
           <view class="center-left">{{ addressItem.addressDetail }}</view>
           <image class="arrow"
-                 src="../../static/images/home/arrow-right.png"></image>
+                 :src="local_url+'home/arrow-right.png'"></image>
         </view>
         <view class="address-des">
           <view class="name">{{ addressItem.name }}</view>
@@ -57,15 +57,15 @@
       <view class="line line1"></view>
       <view class="discount">
         <view class="discount-item"
-              v-if="currentCouponInfo.platformPreferential">
+              v-if="orderGoodsData.platformPreferential">
           <view class="item-left">
             <view class="title">折扣</view>
             <view class="des">限时折扣</view>
           </view>
           <view class="item-right">
-            <view class="price">-¥{{currentCouponInfo.platformPreferential}}</view>
+            <view class="price">-¥{{orderGoodsData.platformPreferential}}</view>
             <image class="arrow"
-                   src="../../static/images/home/arrow-right.png"></image>
+                   :src="local_url+'home/arrow-right.png'"></image>
           </view>
         </view>
         <view class="discount-item"
@@ -75,11 +75,11 @@
           </view>
           <view class="item-right item-quan">
             <view class="price price-non"
-                  v-if="!currentCouponInfo.couponPrice">无可用优惠券</view>
+                  v-if="!orderGoodsData.couponPrice">无可用优惠券</view>
             <view class="price"
-                  v-else>-¥{{currentCouponInfo.couponPrice}}</view>
+                  v-else>-¥{{orderGoodsData.couponPrice}}</view>
             <image class="arrow"
-                   src="../../static/images/home/arrow-right.png"></image>
+                   :src="local_url+'home/arrow-right.png'"></image>
           </view>
         </view>
       </view>
@@ -124,8 +124,10 @@
 </template>
 <script>
 import tools from '../../common/tools.js'
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { wxPay } from '@/common/utils.js'
 
+import { mapState, mapActions, mapMutations } from 'vuex'
+import CONFIG from '@common/config.js'
 export default {
   data() {
     return {
@@ -135,6 +137,7 @@ export default {
       orderGoodsData: null,
       isFromCart: false,
       isFirst: true,
+      local_url: CONFIG.LOACL_URL,
     }
   },
   async onLoad(query) {
@@ -178,6 +181,7 @@ export default {
       'submitOrder',
       'confirmCartOrderInfo',
       'subCartOrder',
+      'delGoodsCart',
     ]),
     ...mapMutations(['setStateByKey']),
     async getConfirmData() {
@@ -203,8 +207,9 @@ export default {
     goToCoupon() {
       uni.navigateTo({
         url:
-          '/pages/userCenter/coupon?amount=' + this.orderGoodsData.orderPrice ||
-          0,
+          '/pages/userCenter/coupon?amount=' +
+          (this.orderGoodsData.orderPrice || 0) +
+          ('&couponId=' + (this.orderGoodsData.couponId || null)),
       })
     },
     selectAddress() {
@@ -221,6 +226,7 @@ export default {
         })
         return
       }
+      uni.showLoading()
       let params = {}
       let res = false
       const addressId = this.addressItem.id
@@ -234,6 +240,10 @@ export default {
           couponPrice: 0,
         }
         res = await this.subCartOrder(params)
+        // 清理购物车
+        if (res) {
+          await delGoodsCart(params.cartIdList)
+        }
       } else {
         let orderGoodsList = []
         this.orderGoodsInfoVoList.forEach((item) => {
@@ -254,11 +264,15 @@ export default {
         }
         res = await this.submitOrder(params)
       }
-
-      if (res) {
-        uni.redirectTo({
-          url: '/pages/home/paySuccess?oid=' + res.id,
-        })
+      if (res && res.payInfo) {
+        try {
+          let isPaySucc = await wxPay(res.payInfo)
+          if (isPaySucc) {
+            uni.redirectTo({
+              url: '/pages/home/paySuccess?oid=' + res.id,
+            })
+          }
+        } catch (error) {}
       }
     },
   },
@@ -268,6 +282,7 @@ export default {
       currentSelectedAddress: null,
       currentCouponInfo: null,
     })
+    uni.removeStorage('orderConfirmInfo')
   },
 }
 </script>

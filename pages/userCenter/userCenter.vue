@@ -8,14 +8,15 @@
           <view class="header-info"
                 v-if="isAuthorize">
             <view class="title">
-              <view class="titlt-text">权志龙的粉丝</view>
+              <view class="titlt-text">{{ loginInfo.nickName }}</view>
               <image class="sex"
                      src='../../static/images/user/sex.png'></image>
             </view>
             <view class="info-detail">
               <view class="info-id">ID</view>
-              <view class="info-num">1057162</view>
-              <view class="info-address">河南·郑州</view>
+              <view class="info-num">{{ loginInfo.id }}</view>
+              <view class="info-address"
+                    v-if="loginInfo.address">{{ loginInfo.address }}</view>
             </view>
           </view>
           <view class="header-none"
@@ -63,36 +64,34 @@
 <script>
 import goodCard from '../components/goods-card.vue'
 import userOrderState from '../components/user/user-order-state.vue'
+import { mapGetters } from 'vuex'
+
 export default {
   components: {
     'good-card': goodCard,
     'user-order-state': userOrderState,
   },
   data() {
-    return {
-      isAuthorize: true,
-      stateList: [
-        { state: 1, title: '待付款', icon: 'state-1', iconWidth: '52rpx' },
-        { state: 2, title: '待发货', icon: 'state-2', iconWidth: '47rpx' },
-        { state: 3, title: '待收货', icon: 'state-3', iconWidth: '52rpx' },
-        { state: 4, title: '收藏', icon: 'state-4', iconWidth: '42rpx' },
-        { state: 5, title: '足迹', icon: 'state-5', iconWidth: '48rpx' },
-      ],
-    }
+    return {}
   },
   computed: {
+    ...mapGetters(['isAuthorize', 'loginInfo']),
     btnText() {
       return this.isAuthorize ? '账户设置' : '授权登陆'
     },
   },
-  onLoad() {},
+  onLoad() {
+    console.log(this.isAuthorize)
+  },
   methods: {
-    clickAccount() {
+    async clickAccount() {
       //   这里其实应该从userInfo中取
-      const tokenInfo = uni.getStorageSync('tokenInfo')
-      let phone = tokenInfo.telephone || ''
+      const userInfo = uni.getStorageSync('userInfo')
+      let phone = userInfo.phone || ''
       if (!this.isAuthorize) {
-        this.isAuthorize = true
+        uni.navigateTo({
+          url: '/pages/userCenter/wxlogin',
+        })
       } else if (phone) {
         uni.navigateTo({
           url: '/pages/userCenter/accountManage',

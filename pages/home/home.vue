@@ -128,7 +128,7 @@ export default {
       uni.showLoading({ title: '加载中' })
       this.isLoading = true
       let homeData = await this.getHomeInfo(this.currentCategoryId)
-      this.tabList = homeData.categoryList
+      this.tabList = homeData.categoryList || []
       this.goodsBestSellingList = homeData.goodsBestSellingList
       this.showTab = true
       this.pageNum = 1

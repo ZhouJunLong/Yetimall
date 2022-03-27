@@ -25,13 +25,7 @@
   </view>
 </template>
 <script>
-/*
-id: 4
-imgUrl: "https://www.yetimall.fun/public/upload/image/store/goods/20220218/c23da5bfdd453f2bf561eac9c1cd4aed.png"
-name: "【NMIXX八站联合】（ms签售版）NMIXX - 1st 单曲专辑 [AD MARE] (Light Ver.)"
-price: 77
-saleQuantity: 54280
-*/
+import { interceptTap } from '@common/utils.js'
 export default {
   name: 'home-rank',
   props: {
@@ -42,6 +36,7 @@ export default {
   },
   methods: {
     gotoDetail(id) {
+      if (!interceptTap()) return
       uni.navigateTo({
         url: '/pages/home/goodsDeatil?id=' + id,
       })

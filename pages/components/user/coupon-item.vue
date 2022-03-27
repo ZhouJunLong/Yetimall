@@ -3,32 +3,42 @@
   <view class="item"
         @click="selectCoupon">
     <image class="item-bg"
+           v-if="couponItem.isAble"
            src='../../../static/images/user/coupon-bg1.png'></image>
+    <image class="item-bg"
+           v-else
+           src='../../../static/images/user/coupon-bg2.png'></image>
     <view class="item-con">
       <view class="item-top">
         <view class="top-left">
-          <view class="title">满减优惠券</view>
-          <view class="des">
+          <view class="title">{{ couponItem.name }}</view>
+          <view class="des"
+                v-if="couponItem.isAble">
             <text>消费满</text>
-            <text class="des-red">300元</text>
+            <text class="des-red">{{ couponItem.amountMin || couponItem.amount }}元</text>
             <text>可以用</text>
           </view>
+          <view class="des"
+                v-else>
+            <text>{{ couponItem.reason }}</text>
+          </view>
         </view>
-        <view class="top-right">
+        <view class="top-right"
+              v-if="couponItem.isAble">
           <view class="price">
-            <view class="price-num">5</view>
+            <view class="price-num">{{ couponItem.amount }}</view>
             <view class="price-icon">元</view>
           </view>
           <image class="selected"
-                 v-if="true"
-                 src='../../../static/images/home/no-selected-icon.png'></image>
+                 v-if="isSelected || couponId == couponItem.id"
+                 :src="local_url+'home/selected-icon.png'"></image>
           <image class="selected"
-                 v-else
-                 src='../../../static/images/home/selected-icon.png'></image>
+                 v-if="!isSelected"
+                 :src="local_url+'home/no-selected-icon.png'"></image>
         </view>
       </view>
       <view class="item-bottom">
-        有效期至2019-07-07 18:50:00
+        {{ couponItem.expireDateText }}
       </view>
     </view>
   </view>
@@ -36,7 +46,7 @@
 </template>
 <script>
 import { mapState, mapActions, mapMutations } from 'vuex'
-
+import CONFIG from '@common/config.js'
 export default {
   name: 'couponItem',
   props: {
@@ -48,23 +58,26 @@ export default {
       type: Number,
       default: 0,
     },
+    couponId: {
+      type: Number,
+      default: 0,
+    },
+  },
+  data() {
+    return {
+      isSelected: false,
+      local_url: CONFIG.LOACL_URL,
+    }
   },
   methods: {
     ...mapMutations(['setStateByKey']),
     selectCoupon() {
-      let date = new Date()
-      let isExpired =
-        date <= this.couponItem.expireDateEnd &&
-        date >= this.couponItem.expireDateStart
-      let isUse = this.couponItem.isUse === 1 ? true : false
-      if (
-        this.couponItem &&
-        this.amount >= this.couponItem.amountMin &&
-        isExpired &&
-        isUse
-      ) {
-        this.setStateByKey('currentCouponInfo', this.couponItem)
-        this.$emit('selectCoupon')
+      if (this.couponItem.isAble) {
+        this.isSelected = true
+        this.setStateByKey({
+          currentCouponInfo: this.couponItem,
+        })
+        this.$emit('selectCoupon', this.couponItem.id)
       }
     },
   },
@@ -74,6 +87,8 @@ export default {
 .item {
   margin-top: 22rpx;
   position: relative;
+  width: 100%;
+  height: 223rpx;
   .item-bg {
     position: absolute;
     width: 100%;
